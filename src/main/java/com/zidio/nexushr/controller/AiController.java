@@ -12,40 +12,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
-// Note: @CrossOrigin removed — CORS handled globally in SecurityConfig
 public class AiController {
 
     private final AiService aiService;
     private final HuggingFaceService huggingFaceService;
 
-    // ─── F-05: Attrition Prediction ──────────────────────────────────────────
     @PostMapping("/attrition")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAttritionPrediction(@RequestBody Map<String, String> request) {
         String employeeData = request.getOrDefault("data", "");
-        return ResponseEntity.ok(Map.of("prediction", aiService.predictAttrition(employeeData)));
+        String prediction = aiService.predictAttrition(employeeData);
+        return ResponseEntity.ok(Map.of("prediction", prediction));
     }
 
-    // ─── F-05: Skill Gap Analysis ─────────────────────────────────────────────
-    @PostMapping("/skill-gap")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
-    public ResponseEntity<?> getSkillGapAnalysis(@RequestBody Map<String, String> request) {
-        String employeeData = request.getOrDefault("data", "");
-        return ResponseEntity.ok(Map.of("analysis", aiService.analyzeSkillGap(employeeData)));
-    }
-
-    // ─── F-05: Engagement Scoring ─────────────────────────────────────────────
-    @PostMapping("/engagement")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
-    public ResponseEntity<?> getEngagementScore(@RequestBody Map<String, String> request) {
-        String employeeData = request.getOrDefault("data", "");
-        return ResponseEntity.ok(Map.of("score", aiService.scoreEngagement(employeeData)));
-    }
-
-    // ─── Sentiment Analysis (internal, used by PerformanceService) ───────────
     @PostMapping("/sentiment")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
-    public ResponseEntity<String> analyze(@RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(huggingFaceService.analyzeSentiment(request.getOrDefault("text", "")));
+    public String analyze(@RequestBody Map<String, String> request) {
+        return huggingFaceService.analyzeSentiment(request.getOrDefault("text", ""));
     }
 }

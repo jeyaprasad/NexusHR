@@ -54,6 +54,25 @@ public class Employee {
 
     private LocalDateTime updatedAt;
 
+    @Column(name = "experience_letter_data")
+    private byte[] experienceLetterData;
+
+    @Column(name = "experience_letter_name")
+    private String experienceLetterName;
+
+    @Column(name = "experience_letter_content_type")
+    private String experienceLetterContentType;
+
+    @Column(name = "graduation_certificate_data")
+    private byte[] graduationCertificateData;
+
+    @Column(name = "graduation_certificate_name")
+    private String graduationCertificateName;
+
+    @Column(name = "graduation_certificate_content_type")
+    private String graduationCertificateContentType;
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

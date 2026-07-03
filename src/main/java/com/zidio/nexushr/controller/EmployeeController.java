@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+import com.zidio.nexushr.entity.Employee;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -56,5 +58,38 @@ public class EmployeeController {
     @GetMapping("/department/{department}")
     public ResponseEntity<List<EmployeeDTO>> getByDepartment(@PathVariable String department) {
         return ResponseEntity.ok(employeeService.getEmployeesByDepartment(department));
+    }
+
+    @PostMapping("/{id}/documents")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    public ResponseEntity<EmployeeDTO> uploadDocuments(
+            @PathVariable Long id,
+            @RequestParam(value = "experienceLetter", required = false) MultipartFile experienceLetter,
+            @RequestParam(value = "graduationCertificate", required = false) MultipartFile graduationCertificate) throws java.io.IOException {
+        return ResponseEntity.ok(employeeService.uploadDocuments(id, experienceLetter, graduationCertificate));
+    }
+
+    @GetMapping("/{id}/documents/experience-letter")
+    public ResponseEntity<byte[]> downloadExperienceLetter(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeEntity(id);
+        if (employee.getExperienceLetterData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType(employee.getExperienceLetterContentType() != null ? employee.getExperienceLetterContentType() : "application/pdf"))
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + employee.getExperienceLetterName() + "\"")
+                .body(employee.getExperienceLetterData());
+    }
+
+    @GetMapping("/{id}/documents/graduation-certificate")
+    public ResponseEntity<byte[]> downloadGraduationCertificate(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeEntity(id);
+        if (employee.getGraduationCertificateData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType(employee.getGraduationCertificateContentType() != null ? employee.getGraduationCertificateContentType() : "application/pdf"))
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + employee.getGraduationCertificateName() + "\"")
+                .body(employee.getGraduationCertificateData());
     }
 }

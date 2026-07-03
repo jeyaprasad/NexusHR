@@ -23,6 +23,8 @@ type Employee = {
   position: string;
   status: string;
   hireDate: string;
+  experienceLetterName?: string;
+  graduationCertificateName?: string;
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -52,6 +54,9 @@ function EmployeesPage() {
     hireDate: new Date().toISOString().split("T")[0],
     status: "ACTIVE",
   });
+
+  const [expLetterFile, setExpLetterFile] = useState<File | null>(null);
+  const [gradCertFile, setGradCertFile] = useState<File | null>(null);
 
   const [user, setUser] = useState<{ role: string } | null>(null);
   const canCreate = user?.role === "ADMIN" || user?.role === "HR";
@@ -87,8 +92,38 @@ function EmployeesPage() {
         throw new Error(errData.message || "Failed to create employee");
       }
       const created = await res.json();
-      setEmployees((prev) => [created, ...prev]);
+
+      if (expLetterFile || gradCertFile) {
+        const formData = new FormData();
+        if (expLetterFile) {
+          formData.append("experienceLetter", expLetterFile);
+        }
+        if (gradCertFile) {
+          formData.append("graduationCertificate", gradCertFile);
+        }
+
+        const token = localStorage.getItem("nexushr_token");
+        const uploadRes = await fetch(`/api/employees/${created.id}/documents`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData.message || "Employee created, but failed to upload documents");
+        }
+        const updated = await uploadRes.json();
+        setEmployees((prev) => [updated, ...prev]);
+      } else {
+        setEmployees((prev) => [created, ...prev]);
+      }
+
       setIsAdding(false);
+      setExpLetterFile(null);
+      setGradCertFile(null);
       setNewEmp({
         employeeId: "",
         firstName: "",
@@ -105,6 +140,26 @@ function EmployeesPage() {
       setError(err.message || "Failed to create employee");
     }
   }
+
+  async function downloadFile(empId: number, docType: "experience-letter" | "graduation-certificate", filename: string) {
+    try {
+      const res = await apiFetch(`/api/employees/${empId}/documents/${docType}`);
+      if (!res.ok) throw new Error("File not found");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to download file");
+    }
+  }
+
 
   const filtered = employees.filter(
     (e) =>
@@ -286,10 +341,35 @@ function EmployeesPage() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono uppercase text-muted-foreground">Experience Letter (PDF)</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setExpLetterFile(e.target.files?.[0] || null)}
+                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono uppercase text-muted-foreground">Graduation Certificate (PDF)</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setGradCertFile(e.target.files?.[0] || null)}
+                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
                 <div className="mt-6 flex justify-end gap-2 pt-2">
                   <button
                     type="button"
-                    onClick={() => setIsAdding(false)}
+                    onClick={() => {
+                      setIsAdding(false);
+                      setExpLetterFile(null);
+                      setGradCertFile(null);
+                    }}
                     className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-sm transition-colors cursor-pointer"
                   >
                     Cancel
@@ -313,7 +393,7 @@ function EmployeesPage() {
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
-                  {["ID", "Name", "Department", "Position", "Status", "Hire Date"].map((h) => (
+                  {["ID", "Name", "Department", "Position", "Status", "Documents", "Hire Date"].map((h) => (
                     <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       {h}
                     </th>
@@ -323,7 +403,7 @@ function EmployeesPage() {
               <tbody className="divide-y divide-border">
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">
+                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">
                       No employees found.
                     </td>
                   </tr>
@@ -342,7 +422,32 @@ function EmployeesPage() {
                         {emp.status}
                       </span>
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1.5">
+                        {emp.experienceLetterName ? (
+                          <button
+                            onClick={() => downloadFile(emp.id, "experience-letter", emp.experienceLetterName!)}
+                            className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                          >
+                            📄 Exp Letter
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground font-mono">No Exp Letter</span>
+                        )}
+                        {emp.graduationCertificateName ? (
+                          <button
+                            onClick={() => downloadFile(emp.id, "graduation-certificate", emp.graduationCertificateName!)}
+                            className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                          >
+                            📄 Grad Cert
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground font-mono">No Grad Cert</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{emp.hireDate}</td>
+
                   </tr>
                 ))}
               </tbody>

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +91,29 @@ public class EmployeeService {
         return employeeRepository.findByDepartment(department).stream()
                 .map(EmployeeDTO::fromEntity)
                 .toList();
+    }
+
+    public EmployeeDTO uploadDocuments(Long id, MultipartFile experienceLetter, MultipartFile graduationCertificate) throws IOException {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
+
+        if (experienceLetter != null && !experienceLetter.isEmpty()) {
+            employee.setExperienceLetterData(experienceLetter.getBytes());
+            employee.setExperienceLetterName(experienceLetter.getOriginalFilename());
+            employee.setExperienceLetterContentType(experienceLetter.getContentType());
+        }
+
+        if (graduationCertificate != null && !graduationCertificate.isEmpty()) {
+            employee.setGraduationCertificateData(graduationCertificate.getBytes());
+            employee.setGraduationCertificateName(graduationCertificate.getOriginalFilename());
+            employee.setGraduationCertificateContentType(graduationCertificate.getContentType());
+        }
+
+        return EmployeeDTO.fromEntity(employeeRepository.save(employee));
+    }
+
+    public Employee getEmployeeEntity(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
     }
 }

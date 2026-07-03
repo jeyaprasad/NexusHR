@@ -26,6 +26,8 @@ public class EmployeeDTO {
     private BigDecimal salary;
     private String status;
     private Long userId;
+    private String experienceLetterName;
+    private String graduationCertificateName;
 
     public static EmployeeDTO fromEntity(Employee emp) {
         return EmployeeDTO.builder()
@@ -41,6 +43,8 @@ public class EmployeeDTO {
                 .salary(emp.getSalary())
                 .status(emp.getStatus().name())
                 .userId(emp.getUser() != null ? emp.getUser().getId() : null)
+                .experienceLetterName(emp.getExperienceLetterName())
+                .graduationCertificateName(emp.getGraduationCertificateName())
                 .build();
     }
 }
