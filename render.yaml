@@ -1,0 +1,57 @@
+services:
+  # 1. PostgreSQL Database
+  - type: psql
+    name: nexushr-db
+    plan: free # Change to starter/standard for production
+    databaseName: nexushr
+    user: nexushr_user
+
+  # 2. Redis Cache
+  - type: redis
+    name: nexushr-redis
+    plan: free # Change to standard for production
+    maxmemoryPolicy: noeviction
+
+  # 3. Spring Boot Backend
+  - type: web
+    name: nexushr-backend
+    env: docker
+    plan: free # Change to starter/standard for production
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Render automatically provisions these environment variables internally
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: nexushr-db
+          property: connectionString
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          type: redis
+          name: nexushr-redis
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          type: redis
+          name: nexushr-redis
+          property: port
+      - key: OPENAI_API_KEY
+        sync: false # You will need to manually add this in the Render dashboard
+
+  # 4. React 19 Frontend (Static Site)
+  - type: web
+    name: nexushr-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+    routes:
+      # Catch-all route to allow React Router to handle client-side routing
+      - type: rewrite
+        source: /*
+        destination: /index.html
