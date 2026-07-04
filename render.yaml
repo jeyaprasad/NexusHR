@@ -11,6 +11,7 @@ services:
     name: nexushr-redis
     plan: free # Change to standard for production
     maxmemoryPolicy: noeviction
+    ipAllowList: [] # Deny all external traffic; only internal Render services can access this
 
   # 3. Spring Boot Backend
   - type: web
