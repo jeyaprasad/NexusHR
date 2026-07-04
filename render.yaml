@@ -19,7 +19,7 @@ services:
         fromDatabase:
           name: nexushr-db
           property: connectionString
-      - key: OPENAI_API_KEY
+      - key: HUGGINGFACE_API_TOKEN
         sync: false # You will need to manually add this in the Render dashboard
 
   # 4. React 19 Frontend (Static Site)
