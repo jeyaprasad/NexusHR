@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tanstackStart({ ssr: false }), react(), tailwindcss(), tsConfigPaths()],
+  plugins: [tanstackStart(), react(), tailwindcss(), tsConfigPaths()],
   server: {
     host: "0.0.0.0",
     proxy: {
