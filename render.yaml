@@ -1,11 +1,11 @@
-services:
+databases:
   # 1. PostgreSQL Database
-  - type: psql
-    name: nexushr-db
+  - name: nexushr-db
     plan: free # Change to starter/standard for production
     databaseName: nexushr
     user: nexushr_user
 
+services:
   # 2. Redis Cache
   - type: redis
     name: nexushr-redis
