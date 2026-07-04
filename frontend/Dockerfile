@@ -18,8 +18,10 @@ RUN bun run build
 FROM oven/bun:1-alpine AS runtime
 WORKDIR /app
 
-# Only copy the built assets
+# Only copy the built assets and dependencies
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
 ENV PORT=3000
