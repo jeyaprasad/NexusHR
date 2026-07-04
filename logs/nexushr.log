@@ -1,2 +1,0 @@
-2026-07-04 19:29:53.747 [main] INFO  c.zidio.nexushr.NexushrApplication [] - Starting NexushrApplication using Java 21.0.3 with PID 20548 (D:\Zidio-Project\target\classes started by RAHENA in D:\Zidio-Project)
-2026-07-04 19:29:53.755 [main] INFO  c.zidio.nexushr.NexushrApplication [] - The following 1 profile is active: "dev"
