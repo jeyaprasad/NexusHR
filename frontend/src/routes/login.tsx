@@ -32,9 +32,7 @@ function LoginPage() {
     setError("");
     try {
       const endpoint = isRegistering ? "/api/auth/register" : "/api/auth/login";
-      const payload = isRegistering
-        ? { email, password, fullName, role }
-        : { email, password };
+      const payload = isRegistering ? { email, password, fullName, role } : { email, password };
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -43,15 +41,22 @@ function LoginPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || (isRegistering ? "Registration failed" : "Invalid credentials"));
+        throw new Error(
+          data.message || data.error || (isRegistering ? "Registration failed" : "Invalid credentials"),
+        );
       }
       const data = await res.json();
       localStorage.setItem("nexushr_token", data.token);
       localStorage.setItem("nexushr_refresh", data.refreshToken);
-      localStorage.setItem("nexushr_user", JSON.stringify({ email: data.email, fullName: data.fullName, role: data.role }));
+      localStorage.setItem(
+        "nexushr_user",
+        JSON.stringify({ email: data.email, fullName: data.fullName, role: data.role }),
+      );
       navigate({ to: "/dashboard" });
-    } catch (err: any) {
-      setError(err.message || (isRegistering ? "Registration failed" : "Login failed"));
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : isRegistering ? "Registration failed" : "Login failed";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -79,7 +84,10 @@ function LoginPage() {
 
           {isRegistering && (
             <div className="space-y-1.5 animate-slide-up">
-              <label htmlFor="fullName" className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              <label
+                htmlFor="fullName"
+                className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground"
+              >
                 Full Name
               </label>
               <input
@@ -95,7 +103,10 @@ function LoginPage() {
           )}
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            <label
+              htmlFor="email"
+              className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground"
+            >
               Email
             </label>
             <input
@@ -111,7 +122,10 @@ function LoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            <label
+              htmlFor="password"
+              className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground"
+            >
               Password
             </label>
             <input
@@ -128,7 +142,10 @@ function LoginPage() {
 
           {isRegistering && (
             <div className="space-y-1.5 animate-slide-up">
-              <label htmlFor="role" className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              <label
+                htmlFor="role"
+                className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground"
+              >
                 Role
               </label>
               <select
@@ -151,7 +168,13 @@ function LoginPage() {
             disabled={loading}
             className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-sm hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
-            {loading ? (isRegistering ? "Creating account…" : "Signing in…") : (isRegistering ? "Register" : "Sign In")}
+            {loading
+              ? isRegistering
+                ? "Creating account…"
+                : "Signing in…"
+              : isRegistering
+                ? "Register"
+                : "Sign In"}
           </button>
         </form>
 

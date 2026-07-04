@@ -74,9 +74,13 @@ function PerformancePage() {
       <Sidebar />
       <main className="flex-1 px-8 py-8">
         <div className="mb-6">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">Reviews</div>
+          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
+            Reviews
+          </div>
           <h1 className="font-display text-3xl font-extrabold tracking-tight">Performance</h1>
-          <p className="text-sm text-muted-foreground mt-1">360-degree reviews with AI sentiment analysis on feedback.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            360-degree reviews with AI sentiment analysis on feedback.
+          </p>
         </div>
 
         {loading ? (
@@ -89,30 +93,42 @@ function PerformancePage() {
               </div>
             )}
             {reviews.map((r) => (
-              <div key={r.id} className="border border-border rounded-sm p-5 bg-card hover:bg-card/80 transition-colors">
+              <div
+                key={r.id}
+                className="border border-border rounded-sm p-5 bg-card hover:bg-card/80 transition-colors"
+              >
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
                     <div className="font-semibold">{r.employeeName}</div>
-                    <div className="text-xs text-muted-foreground">Reviewed by {r.reviewerName} · {r.reviewDate}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Reviewed by {r.reviewerName} · {r.reviewDate}
+                    </div>
                   </div>
                   <div className="flex items-center gap-3">
                     {r.sentiment && (
-                      <span className={`font-mono text-[10px] font-bold uppercase ${SENTIMENT_COLORS[r.sentiment] ?? ""}`}>
+                      <span
+                        className={`font-mono text-[10px] font-bold uppercase ${SENTIMENT_COLORS[r.sentiment] ?? ""}`}
+                      >
                         {r.sentiment}
                       </span>
                     )}
-                    <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}>
+                    <span
+                      className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                    >
                       {r.status}
                     </span>
                   </div>
                 </div>
                 <StarRating rating={r.rating} />
                 {r.feedback && (
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed line-clamp-3">{r.feedback}</p>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    {r.feedback}
+                  </p>
                 )}
                 {r.goals && (
                   <div className="mt-2 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">Goals: </span>{r.goals}
+                    <span className="font-semibold text-foreground">Goals: </span>
+                    {r.goals}
                   </div>
                 )}
               </div>

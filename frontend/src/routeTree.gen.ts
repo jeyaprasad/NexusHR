@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LeavesRouteImport } from './routes/leaves'
 import { Route as EmployeesRouteImport } from './routes/employees'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AttendanceRouteImport } from './routes/attendance'
@@ -31,6 +32,11 @@ const PayrollRoute = PayrollRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeavesRoute = LeavesRouteImport.update({
+  id: '/leaves',
+  path: '/leaves',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeesRoute = EmployeesRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/attendance': typeof AttendanceRoute
   '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRoute
+  '/leaves': typeof LeavesRoute
   '/login': typeof LoginRoute
   '/payroll': typeof PayrollRoute
   '/performance': typeof PerformanceRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/attendance': typeof AttendanceRoute
   '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRoute
+  '/leaves': typeof LeavesRoute
   '/login': typeof LoginRoute
   '/payroll': typeof PayrollRoute
   '/performance': typeof PerformanceRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/attendance': typeof AttendanceRoute
   '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRoute
+  '/leaves': typeof LeavesRoute
   '/login': typeof LoginRoute
   '/payroll': typeof PayrollRoute
   '/performance': typeof PerformanceRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/dashboard'
     | '/employees'
+    | '/leaves'
     | '/login'
     | '/payroll'
     | '/performance'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/dashboard'
     | '/employees'
+    | '/leaves'
     | '/login'
     | '/payroll'
     | '/performance'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/dashboard'
     | '/employees'
+    | '/leaves'
     | '/login'
     | '/payroll'
     | '/performance'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   AttendanceRoute: typeof AttendanceRoute
   DashboardRoute: typeof DashboardRoute
   EmployeesRoute: typeof EmployeesRoute
+  LeavesRoute: typeof LeavesRoute
   LoginRoute: typeof LoginRoute
   PayrollRoute: typeof PayrollRoute
   PerformanceRoute: typeof PerformanceRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaves': {
+      id: '/leaves'
+      path: '/leaves'
+      fullPath: '/leaves'
+      preLoaderRoute: typeof LeavesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employees': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   AttendanceRoute: AttendanceRoute,
   DashboardRoute: DashboardRoute,
   EmployeesRoute: EmployeesRoute,
+  LeavesRoute: LeavesRoute,
   LoginRoute: LoginRoute,
   PayrollRoute: PayrollRoute,
   PerformanceRoute: PerformanceRoute,

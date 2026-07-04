@@ -47,6 +47,12 @@ public class LeaveController {
         return ResponseEntity.ok(leaveService.updateLeaveStatus(id, status));
     }
 
+    @PutMapping("/batch-status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    public ResponseEntity<List<LeaveDTO>> batchUpdateStatus(@RequestBody List<Long> ids, @RequestParam String status) {
+        return ResponseEntity.ok(leaveService.batchUpdateStatus(ids, status));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLeave(@PathVariable Long id) {

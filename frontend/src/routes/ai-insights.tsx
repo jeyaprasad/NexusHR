@@ -15,7 +15,10 @@ export const Route = createFileRoute("/ai-insights")({
 
 type InsightType = "attrition" | "skill-gap" | "engagement";
 
-const INSIGHT_CONFIG: Record<InsightType, { label: string; icon: string; endpoint: string; responseKey: string; placeholder: string }> = {
+const INSIGHT_CONFIG: Record<
+  InsightType,
+  { label: string; icon: string; endpoint: string; responseKey: string; placeholder: string }
+> = {
   attrition: {
     label: "Attrition Prediction",
     icon: "⚠️",
@@ -61,8 +64,9 @@ function AiInsightsPage() {
       if (!res.ok) throw new Error("AI request failed");
       const data = await res.json();
       setResult(data[config.responseKey] ?? JSON.stringify(data));
-    } catch (err: any) {
-      setError(err.message || "AI service unavailable");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "AI service unavailable";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -78,10 +82,15 @@ function AiInsightsPage() {
       <Sidebar />
       <main className="flex-1 px-8 py-8 max-w-4xl">
         <div className="mb-6">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">F-05 · Spring AI</div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight">AI Workforce Insights</h1>
+          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
+            F-05 · Spring AI
+          </div>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight">
+            AI Workforce Insights
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Powered by HuggingFace LLM — Attrition prediction, skill gap analysis, engagement scoring.
+            Powered by HuggingFace LLM — Attrition prediction, skill gap analysis, engagement
+            scoring.
           </p>
         </div>
 
@@ -91,7 +100,12 @@ function AiInsightsPage() {
             <button
               key={key}
               id={`ai-tab-${key}`}
-              onClick={() => { setActiveTab(key); setResult(""); setError(""); setInput(""); }}
+              onClick={() => {
+                setActiveTab(key);
+                setResult("");
+                setError("");
+                setInput("");
+              }}
               className={`flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-sm transition-colors ${
                 activeTab === key
                   ? "bg-background shadow-sm text-foreground"
@@ -108,7 +122,10 @@ function AiInsightsPage() {
           {/* Input */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label htmlFor="ai-input" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <label
+                htmlFor="ai-input"
+                className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+              >
                 Employee Data
               </label>
               <button
@@ -139,16 +156,22 @@ function AiInsightsPage() {
 
           {/* Output */}
           <div className="space-y-3">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">AI Response</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              AI Response
+            </div>
             <div
               id="ai-output"
               className="min-h-[300px] border border-border rounded-sm p-4 bg-card text-sm leading-relaxed whitespace-pre-wrap"
             >
-              {loading && <span className="text-muted-foreground animate-pulse">Generating insight…</span>}
+              {loading && (
+                <span className="text-muted-foreground animate-pulse">Generating insight…</span>
+              )}
               {error && <span className="text-destructive">{error}</span>}
               {!loading && !error && result && result}
               {!loading && !error && !result && (
-                <span className="text-muted-foreground">Enter employee data and click Run to generate insight.</span>
+                <span className="text-muted-foreground">
+                  Enter employee data and click Run to generate insight.
+                </span>
               )}
             </div>
           </div>

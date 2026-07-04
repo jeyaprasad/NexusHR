@@ -37,9 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Integrate CORS into the Security filter chain (replaces standalone CorsFilter bean)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // CSRF disabled: stateless JWT API — no session cookies to protect
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(ex -> ex
@@ -54,11 +52,19 @@ public class SecurityConfig {
                     response.getWriter().write("{\"error\":\"Forbidden\",\"message\":\"Access denied\"}");
                 })
             )
+            .headers(headers -> headers
+                .xssProtection(xss -> xss.disable())
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"))
+                .frameOptions(frame -> frame.deny())
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api-docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info").permitAll()
+                .requestMatchers("/actuator/metrics", "/actuator/health/liveness", "/actuator/health/readiness").permitAll()
+                .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

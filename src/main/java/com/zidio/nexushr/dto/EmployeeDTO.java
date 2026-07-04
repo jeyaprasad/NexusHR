@@ -26,6 +26,7 @@ public class EmployeeDTO {
     private BigDecimal salary;
     private String status;
     private Long userId;
+    private Double leaveBalance;
     private String experienceLetterName;
     private String graduationCertificateName;
 
@@ -43,6 +44,7 @@ public class EmployeeDTO {
                 .salary(emp.getSalary())
                 .status(emp.getStatus().name())
                 .userId(emp.getUser() != null ? emp.getUser().getId() : null)
+                .leaveBalance(emp.getLeaveBalance())
                 .experienceLetterName(emp.getExperienceLetterName())
                 .graduationCertificateName(emp.getGraduationCertificateName())
                 .build();

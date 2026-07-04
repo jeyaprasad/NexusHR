@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface LeaveRepository extends JpaRepository<Leave, Long> {
     List<Leave> findByEmployee(Employee employee);
+    long countByStatus(Leave.LeaveStatus status);
 }

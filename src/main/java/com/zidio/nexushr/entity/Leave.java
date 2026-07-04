@@ -6,7 +6,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "leaves")
+@Table(name = "leaves", indexes = {
+    @Index(name = "idx_leave_employee_id", columnList = "employee_id"),
+    @Index(name = "idx_leave_status", columnList = "status"),
+    @Index(name = "idx_leave_type", columnList = "leave_type"),
+    @Index(name = "idx_leave_dates", columnList = "start_date,end_date")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,6 +41,10 @@ public class Leave {
 
     private String reason;
 
+    @Builder.Default
+    @Column(name = "half_day", nullable = false)
+    private Boolean halfDay = false;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -45,6 +54,7 @@ public class Leave {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) status = LeaveStatus.PENDING;
+        if (halfDay == null) halfDay = false;
     }
 
     @PreUpdate

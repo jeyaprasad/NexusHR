@@ -8,11 +8,13 @@ import com.zidio.nexushr.repository.AttendanceRepository;
 import com.zidio.nexushr.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -50,12 +52,23 @@ public class AttendanceService {
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", dto.getEmployeeId()));
 
+        Attendance.AttendanceStatus status;
+        if (dto.getStatus() != null) {
+            status = Attendance.AttendanceStatus.valueOf(dto.getStatus());
+        } else if (dto.getCheckIn() != null && dto.getCheckIn().isAfter(LocalTime.of(9, 0))) {
+            status = Attendance.AttendanceStatus.LATE;
+        } else if (dto.getCheckIn() != null) {
+            status = Attendance.AttendanceStatus.PRESENT;
+        } else {
+            status = Attendance.AttendanceStatus.ABSENT;
+        }
+
         Attendance attendance = Attendance.builder()
                 .employee(employee)
                 .date(dto.getDate() != null ? dto.getDate() : LocalDate.now())
                 .checkIn(dto.getCheckIn())
                 .checkOut(dto.getCheckOut())
-                .status(Attendance.AttendanceStatus.valueOf(dto.getStatus()))
+                .status(status)
                 .notes(dto.getNotes())
                 .build();
 
@@ -68,7 +81,9 @@ public class AttendanceService {
 
         attendance.setCheckIn(dto.getCheckIn());
         attendance.setCheckOut(dto.getCheckOut());
-        attendance.setStatus(Attendance.AttendanceStatus.valueOf(dto.getStatus()));
+        if (dto.getStatus() != null) {
+            attendance.setStatus(Attendance.AttendanceStatus.valueOf(dto.getStatus()));
+        }
         attendance.setNotes(dto.getNotes());
 
         return AttendanceDTO.fromEntity(attendanceRepository.save(attendance));
@@ -79,5 +94,48 @@ public class AttendanceService {
             throw new ResourceNotFoundException("Attendance", "id", id);
         }
         attendanceRepository.deleteById(id);
+    }
+
+    @Transactional
+    public int autoProcessToday() {
+        LocalDate today = LocalDate.now();
+        List<Employee> activeEmployees = employeeRepository.findByStatus(Employee.EmploymentStatus.ACTIVE);
+        int processed = 0;
+
+        for (Employee employee : activeEmployees) {
+            boolean alreadyExists = attendanceRepository.findByEmployeeAndDate(employee, today).isPresent();
+            if (!alreadyExists) {
+                Attendance attendance = Attendance.builder()
+                        .employee(employee)
+                        .date(today)
+                        .status(Attendance.AttendanceStatus.ABSENT)
+                        .notes("Auto-marked absent")
+                        .build();
+                attendanceRepository.save(attendance);
+                processed++;
+            }
+        }
+        return processed;
+    }
+
+    @Transactional
+    public int autoProcessDate(LocalDate date) {
+        List<Employee> activeEmployees = employeeRepository.findByStatus(Employee.EmploymentStatus.ACTIVE);
+        int processed = 0;
+
+        for (Employee employee : activeEmployees) {
+            boolean alreadyExists = attendanceRepository.findByEmployeeAndDate(employee, date).isPresent();
+            if (!alreadyExists) {
+                Attendance attendance = Attendance.builder()
+                        .employee(employee)
+                        .date(date)
+                        .status(Attendance.AttendanceStatus.ABSENT)
+                        .notes("Auto-marked absent")
+                        .build();
+                attendanceRepository.save(attendance);
+                processed++;
+            }
+        }
+        return processed;
     }
 }

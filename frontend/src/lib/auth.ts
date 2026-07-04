@@ -39,9 +39,12 @@ export function logout() {
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
+  const hasContentType = Object.keys(headers).some(k => k.toLowerCase() === "content-type");
+  if (!hasContentType) {
+    headers["Content-Type"] = "application/json";
+  }
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }

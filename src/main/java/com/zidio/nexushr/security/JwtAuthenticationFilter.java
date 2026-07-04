@@ -32,7 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             // Check if token is blacklisted
-            if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+            boolean isBlacklisted = false;
+            try {
+                isBlacklisted = Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
+            } catch (Exception e) {
+                logger.warn("Redis connection failed. Skipping token blacklist check: " + e.getMessage());
+            }
+            if (isBlacklisted) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been revoked");
                 return;
             }

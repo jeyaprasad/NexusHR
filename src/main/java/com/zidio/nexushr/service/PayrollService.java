@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -159,6 +160,38 @@ public class PayrollService {
             throw new ResourceNotFoundException("Payroll", "id", id);
         }
         payrollRepository.deleteById(id);
+    }
+
+    @Transactional
+    public List<PayrollDTO> processBatchPayroll(String payPeriod) {
+        List<Employee> activeEmployees = employeeRepository.findByStatus(Employee.EmploymentStatus.ACTIVE);
+        List<PayrollDTO> results = new java.util.ArrayList<>();
+        List<String> errors = new java.util.ArrayList<>();
+
+        for (Employee employee : activeEmployees) {
+            try {
+                boolean alreadyExists = !payrollRepository.findByEmployeeAndPayPeriod(employee, payPeriod).isEmpty();
+                if (alreadyExists) {
+                    errors.add("Employee " + employee.getEmployeeId() + " already has payroll for " + payPeriod);
+                    continue;
+                }
+
+                PayrollDTO dto = PayrollDTO.builder()
+                        .employeeId(employee.getId())
+                        .payPeriod(payPeriod)
+                        .build();
+                results.add(createPayroll(dto));
+            } catch (Exception e) {
+                log.error("Failed to process payroll for employee ID: {}", employee.getId(), e);
+                errors.add("Employee " + employee.getEmployeeId() + ": " + e.getMessage());
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            log.warn("Batch payroll completed with {} errors: {}", errors.size(), String.join("; ", errors));
+        }
+
+        return results;
     }
 
     public byte[] generatePayslipPdf(Long id) {

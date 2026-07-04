@@ -9,6 +9,7 @@ import com.zidio.nexushr.exception.DuplicateResourceException;
 import com.zidio.nexushr.repository.UserRepository;
 import com.zidio.nexushr.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -52,7 +54,11 @@ public class AuthService {
         );
         String token = jwtTokenProvider.generateToken(authentication);
         String refreshToken = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        try {
+            redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.warn("Redis connection failed. Refresh token not stored in Redis: {}", e.getMessage());
+        }
 
         return AuthResponse.builder()
                 .token(token)
@@ -72,7 +78,11 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(authentication);
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         String refreshToken = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        try {
+            redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.warn("Redis connection failed. Refresh token not stored in Redis: {}", e.getMessage());
+        }
 
         return AuthResponse.builder()
                 .token(token)
@@ -85,7 +95,12 @@ public class AuthService {
     }
 
     public AuthResponse refreshToken(String refreshToken) {
-        String email = redisTemplate.opsForValue().get("refresh:" + refreshToken);
+        String email = null;
+        try {
+            email = redisTemplate.opsForValue().get("refresh:" + refreshToken);
+        } catch (Exception e) {
+            log.warn("Redis connection failed on token lookup: {}", e.getMessage());
+        }
         if (email == null) {
             throw new IllegalArgumentException("Invalid or expired refresh token");
         }
@@ -97,8 +112,12 @@ public class AuthService {
         );
         String newToken = jwtTokenProvider.generateToken(authentication);
         String newRefreshToken = UUID.randomUUID().toString();
-        redisTemplate.delete("refresh:" + refreshToken);
-        redisTemplate.opsForValue().set("refresh:" + newRefreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        try {
+            redisTemplate.delete("refresh:" + refreshToken);
+            redisTemplate.opsForValue().set("refresh:" + newRefreshToken, user.getEmail(), 7, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.warn("Redis connection failed. New refresh token not updated: {}", e.getMessage());
+        }
 
         return AuthResponse.builder()
                 .token(newToken)
@@ -114,6 +133,10 @@ public class AuthService {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        redisTemplate.opsForValue().set("blacklist:" + token, "revoked", 24, TimeUnit.HOURS);
+        try {
+            redisTemplate.opsForValue().set("blacklist:" + token, "revoked", 24, TimeUnit.HOURS);
+        } catch (Exception e) {
+            log.warn("Redis connection failed. Token not blacklisted: {}", e.getMessage());
+        }
     }
 }

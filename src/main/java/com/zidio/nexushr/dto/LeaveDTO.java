@@ -20,10 +20,13 @@ public class LeaveDTO {
     private String leaveType;
     private String status;
     private String reason;
-    private Integer duration;
+    private Double duration;
+    private Boolean halfDay;
 
     public static LeaveDTO fromEntity(Leave leave) {
-        long durationDays = java.time.temporal.ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1;
+        double durationDays = leave.getHalfDay() != null && leave.getHalfDay() 
+                ? 0.5 
+                : (java.time.temporal.ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1);
         return LeaveDTO.builder()
                 .id(leave.getId())
                 .employeeId(leave.getEmployee().getId())
@@ -33,7 +36,8 @@ public class LeaveDTO {
                 .leaveType(leave.getLeaveType())
                 .status(leave.getStatus().name())
                 .reason(leave.getReason())
-                .duration((int) durationDays)
+                .duration(durationDays)
+                .halfDay(leave.getHalfDay() != null ? leave.getHalfDay() : false)
                 .build();
     }
 }

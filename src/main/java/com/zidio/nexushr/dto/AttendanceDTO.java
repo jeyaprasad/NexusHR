@@ -20,6 +20,9 @@ public class AttendanceDTO {
     private LocalDate date;
     private LocalTime checkIn;
     private LocalTime checkOut;
+    private Double hoursWorked;
+    private Double overtimeHours;
+    private Integer lateMinutes;
     private String status;
     private String notes;
 
@@ -31,6 +34,9 @@ public class AttendanceDTO {
                 .date(att.getDate())
                 .checkIn(att.getCheckIn())
                 .checkOut(att.getCheckOut())
+                .hoursWorked(att.getHoursWorked())
+                .overtimeHours(att.getOvertimeHours())
+                .lateMinutes(att.getLateMinutes())
                 .status(att.getStatus().name())
                 .notes(att.getNotes())
                 .build();

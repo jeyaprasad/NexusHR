@@ -20,6 +20,9 @@ type AttendanceRecord = {
   date: string;
   checkIn: string | null;
   checkOut: string | null;
+  hoursWorked: number | null;
+  overtimeHours: number | null;
+  lateMinutes: number | null;
   status: string;
   notes: string | null;
 };
@@ -50,27 +53,67 @@ function AttendancePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const [autoProcessing, setAutoProcessing] = useState(false);
+
+  async function handleAutoProcess() {
+    setAutoProcessing(true);
+    try {
+      const res = await apiFetch("/api/attendance/auto-process/today", { method: "POST" });
+      if (!res.ok) throw new Error("Auto-process failed");
+      const data = await res.json();
+      alert(`Auto-processed: ${data.processed} employees marked absent`);
+      window.location.reload();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Auto-process failed");
+    } finally {
+      setAutoProcessing(false);
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 px-8 py-8">
-        <div className="mb-6">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">Tracking</div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight">Attendance</h1>
-          <p className="text-sm text-muted-foreground mt-1">{today}</p>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
+              Tracking
+            </div>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight">Attendance</h1>
+            <p className="text-sm text-muted-foreground mt-1">{today}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleAutoProcess}
+              disabled={autoProcessing}
+              className="px-4 py-2 text-sm font-semibold border border-border rounded-sm hover:bg-secondary transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {autoProcessing ? "Processing…" : "Auto-Process Today"}
+            </button>
+          </div>
         </div>
 
         {loading ? (
-          <div className="text-sm text-muted-foreground animate-pulse">Loading attendance records…</div>
+          <div className="text-sm text-muted-foreground animate-pulse">
+            Loading attendance records…
+          </div>
         ) : (
           <div className="border border-border rounded-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
-                  {["Employee", "Date", "Check In", "Check Out", "Status", "Notes"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {["Employee", "Date", "Check In", "Check Out", "Hours", "Overtime", "Late", "Status", "Notes"].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                    >
                       {h}
                     </th>
                   ))}
@@ -79,7 +122,9 @@ function AttendancePage() {
               <tbody className="divide-y divide-border">
                 {records.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No attendance records found.</td>
+                    <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
+                      No attendance records found.
+                    </td>
                   </tr>
                 )}
                 {records.map((r) => (
@@ -88,8 +133,13 @@ function AttendancePage() {
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.date}</td>
                     <td className="px-4 py-3 font-mono text-xs">{r.checkIn ?? "—"}</td>
                     <td className="px-4 py-3 font-mono text-xs">{r.checkOut ?? "—"}</td>
+                    <td className="px-4 py-3 font-mono text-xs">{r.hoursWorked != null ? r.hoursWorked + "h" : "—"}</td>
+                    <td className="px-4 py-3 font-mono text-xs">{r.overtimeHours != null && r.overtimeHours > 0 ? r.overtimeHours + "h" : "—"}</td>
+                    <td className="px-4 py-3 font-mono text-xs">{r.lateMinutes != null && r.lateMinutes > 0 ? r.lateMinutes + "m" : "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}>
+                      <span
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                      >
                         {r.status}
                       </span>
                     </td>

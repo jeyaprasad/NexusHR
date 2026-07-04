@@ -60,6 +60,12 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeesByDepartment(department));
     }
 
+    @PostMapping("/import")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    public ResponseEntity<List<EmployeeDTO>> importEmployees(@RequestParam("file") MultipartFile file) throws java.io.IOException {
+        return ResponseEntity.ok(employeeService.importCsv(file));
+    }
+
     @PostMapping("/{id}/documents")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<EmployeeDTO> uploadDocuments(

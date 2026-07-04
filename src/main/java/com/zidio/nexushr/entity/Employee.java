@@ -7,7 +7,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "employees")
+@Table(name = "employees", indexes = {
+    @Index(name = "idx_emp_employee_id", columnList = "employeeId", unique = true),
+    @Index(name = "idx_emp_email", columnList = "email", unique = true),
+    @Index(name = "idx_emp_department", columnList = "department"),
+    @Index(name = "idx_emp_status", columnList = "status"),
+    @Index(name = "idx_emp_user_id", columnList = "user_id")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,7 +47,7 @@ public class Employee {
 
     private BigDecimal salary;
 
-    private Integer leaveBalance;
+    private Double leaveBalance;
 
     @Enumerated(EnumType.STRING)
     private EmploymentStatus status;
@@ -78,7 +84,7 @@ public class Employee {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (leaveBalance == null) {
-            leaveBalance = 30;
+            leaveBalance = 30.0;
         }
         if (hireDate == null) {
             hireDate = java.time.LocalDate.now();

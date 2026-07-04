@@ -62,4 +62,19 @@ public class AttendanceController {
         attendanceService.deleteAttendance(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/auto-process/today")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    public ResponseEntity<java.util.Map<String, Integer>> autoProcessToday() {
+        int count = attendanceService.autoProcessToday();
+        return ResponseEntity.ok(java.util.Map.of("processed", count));
+    }
+
+    @PostMapping("/auto-process")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    public ResponseEntity<java.util.Map<String, Integer>> autoProcessDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        int count = attendanceService.autoProcessDate(date);
+        return ResponseEntity.ok(java.util.Map.of("processed", count));
+    }
 }

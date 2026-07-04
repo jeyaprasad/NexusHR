@@ -76,7 +76,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .position("System Administrator")
                     .hireDate(LocalDate.now().minusYears(3))
                     .salary(BigDecimal.valueOf(120000))
-                    .leaveBalance(30)
+                    .leaveBalance(30.0)
                     .status(Employee.EmploymentStatus.ACTIVE)
                     .user(adminUser)
                     .build();
@@ -91,7 +91,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .position("HR Director")
                     .hireDate(LocalDate.now().minusYears(2))
                     .salary(BigDecimal.valueOf(95000))
-                    .leaveBalance(30)
+                    .leaveBalance(30.0)
                     .status(Employee.EmploymentStatus.ACTIVE)
                     .user(hrUser)
                     .build();
@@ -106,7 +106,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .position("Engineering Manager")
                     .hireDate(LocalDate.now().minusYears(2))
                     .salary(BigDecimal.valueOf(110000))
-                    .leaveBalance(30)
+                    .leaveBalance(30.0)
                     .status(Employee.EmploymentStatus.ACTIVE)
                     .user(managerUser)
                     .build();
@@ -121,7 +121,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .position("Lead Engineer")
                     .hireDate(LocalDate.now().minusYears(1))
                     .salary(BigDecimal.valueOf(85000))
-                    .leaveBalance(30)
+                    .leaveBalance(30.0)
                     .status(Employee.EmploymentStatus.ACTIVE)
                     .user(employeeUser)
                     .build();

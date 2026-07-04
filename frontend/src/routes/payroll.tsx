@@ -35,7 +35,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 function fmt(n: number | null | undefined) {
   if (n == null) return "$0.00";
-  return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  );
 }
 
 function PayrollPage() {
@@ -56,6 +58,11 @@ function PayrollPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const [batchProcessing, setBatchProcessing] = useState(false);
+  const [batchPayPeriod, setBatchPayPeriod] = useState(
+    new Date().toLocaleString("en-US", { month: "long", year: "numeric" }).replace(" ", " ")
+  );
+
   function downloadPayslip(id: number) {
     apiFetch(`/api/payroll/${id}/payslip`)
       .then((r) => r.blob())
@@ -70,25 +77,82 @@ function PayrollPage() {
       .catch(console.error);
   }
 
+  async function handleBatchPayroll() {
+    setBatchProcessing(true);
+    try {
+      const res = await apiFetch(`/api/payroll/batch?payPeriod=${encodeURIComponent(batchPayPeriod)}`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Batch payroll failed");
+      }
+      const result = await res.json();
+      alert(`Batch payroll processed: ${result.length} payslips generated`);
+      window.location.reload();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Batch payroll failed");
+    } finally {
+      setBatchProcessing(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 px-8 py-8">
-        <div className="mb-6">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">Compensation</div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight">Payroll</h1>
-          <p className="text-sm text-muted-foreground mt-1">Automated tax computation via progressive brackets. Monthly runs on the 28th.</p>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
+              Compensation
+            </div>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight">Payroll</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Automated tax computation via progressive brackets. Monthly runs on the 28th.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={batchPayPeriod}
+              onChange={(e) => setBatchPayPeriod(e.target.value)}
+              className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm w-44 focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+              placeholder="e.g. July 2026"
+            />
+            <button
+              onClick={handleBatchPayroll}
+              disabled={batchProcessing}
+              className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {batchProcessing ? "Processing…" : "Run Batch Payroll"}
+            </button>
+          </div>
         </div>
 
         {loading ? (
-          <div className="text-sm text-muted-foreground animate-pulse">Loading payroll records…</div>
+          <div className="text-sm text-muted-foreground animate-pulse">
+            Loading payroll records…
+          </div>
         ) : (
           <div className="border border-border rounded-sm overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
-                  {["Employee", "Pay Period", "Basic", "Allowances", "Tax", "Deductions", "Net Salary", "Status", ""].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+                  {[
+                    "Employee",
+                    "Pay Period",
+                    "Basic",
+                    "Allowances",
+                    "Tax",
+                    "Deductions",
+                    "Net Salary",
+                    "Status",
+                    "",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground whitespace-nowrap"
+                    >
                       {h}
                     </th>
                   ))}
@@ -97,20 +161,32 @@ function PayrollPage() {
               <tbody className="divide-y divide-border">
                 {records.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">No payroll records found.</td>
+                    <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
+                      No payroll records found.
+                    </td>
                   </tr>
                 )}
                 {records.map((r) => (
                   <tr key={r.id} className="hover:bg-foreground/[0.02] transition-colors">
                     <td className="px-4 py-3 font-medium">{r.employeeName}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.payPeriod}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {r.payPeriod}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs">{fmt(r.basicSalary)}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-green-600">+{fmt(r.allowances)}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-destructive">-{fmt(r.taxAmount)}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-destructive">-{fmt(r.deductions)}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-green-600">
+                      +{fmt(r.allowances)}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-destructive">
+                      -{fmt(r.taxAmount)}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-destructive">
+                      -{fmt(r.deductions)}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs font-bold">{fmt(r.netSalary)}</td>
                     <td className="px-4 py-3">
-                      <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}>
+                      <span
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                      >
                         {r.status}
                       </span>
                     </td>

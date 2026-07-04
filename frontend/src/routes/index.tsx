@@ -122,10 +122,18 @@ function LandingPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <a href="/login" id="signin-nav-btn" className="text-sm font-medium px-4 py-2 hover:bg-foreground/5 rounded-sm transition-colors">
+            <a
+              href="/login"
+              id="signin-nav-btn"
+              className="text-sm font-medium px-4 py-2 hover:bg-foreground/5 rounded-sm transition-colors"
+            >
               Sign In
             </a>
-            <a href="/login" id="getstarted-nav-btn" className="text-sm font-medium bg-foreground text-background px-5 py-2 rounded-sm hover:bg-foreground/90 transition-colors">
+            <a
+              href="/login"
+              id="getstarted-nav-btn"
+              className="text-sm font-medium bg-foreground text-background px-5 py-2 rounded-sm hover:bg-foreground/90 transition-colors"
+            >
               Get Started
             </a>
           </div>
@@ -175,7 +183,11 @@ function LandingPage() {
                   <div className="text-2xl font-display font-extrabold">AI-Powered</div>
                 </div>
               </div>
-              <a href="/login" id="hero-cta-btn" className="inline-block text-sm font-medium bg-foreground text-background px-6 py-3 rounded-sm hover:bg-foreground/90 transition-colors">
+              <a
+                href="/login"
+                id="hero-cta-btn"
+                className="inline-block text-sm font-medium bg-foreground text-background px-6 py-3 rounded-sm hover:bg-foreground/90 transition-colors"
+              >
                 Get Started
               </a>
             </div>
@@ -314,10 +326,7 @@ function LandingPage() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-6">
           {INFRA.map((item) => (
-            <div
-              key={item}
-              className="flex items-start gap-3 border-t border-border pt-4"
-            >
+            <div key={item} className="flex items-start gap-3 border-t border-border pt-4">
               <div className="size-3 mt-1.5 bg-primary flex-shrink-0" />
               <span className="text-sm font-medium leading-relaxed">{item}</span>
             </div>

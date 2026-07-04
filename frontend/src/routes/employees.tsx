@@ -38,7 +38,7 @@ function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  
+
   // Create Employee states
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
@@ -57,6 +57,11 @@ function EmployeesPage() {
 
   const [expLetterFile, setExpLetterFile] = useState<File | null>(null);
   const [gradCertFile, setGradCertFile] = useState<File | null>(null);
+
+  // CSV import
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState("");
 
   const [user, setUser] = useState<{ role: string } | null>(null);
   const canCreate = user?.role === "ADMIN" || user?.role === "HR";
@@ -106,7 +111,7 @@ function EmployeesPage() {
         const uploadRes = await fetch(`/api/employees/${created.id}/documents`, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         });
@@ -136,12 +141,17 @@ function EmployeesPage() {
         hireDate: new Date().toISOString().split("T")[0],
         status: "ACTIVE",
       });
-    } catch (err: any) {
-      setError(err.message || "Failed to create employee");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to create employee";
+      setError(errorMsg);
     }
   }
 
-  async function downloadFile(empId: number, docType: "experience-letter" | "graduation-certificate", filename: string) {
+  async function downloadFile(
+    empId: number,
+    docType: "experience-letter" | "graduation-certificate",
+    filename: string,
+  ) {
     try {
       const res = await apiFetch(`/api/employees/${empId}/documents/${docType}`);
       if (!res.ok) throw new Error("File not found");
@@ -160,12 +170,38 @@ function EmployeesPage() {
     }
   }
 
+  async function handleCsvImport() {
+    if (!csvFile) return;
+    setImporting(true);
+    setImportResult("");
+    try {
+      const formData = new FormData();
+      formData.append("file", csvFile);
+      const token = localStorage.getItem("nexushr_token");
+      const res = await fetch("/api/employees/import", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || err.error || "Import failed");
+      }
+      const imported = await res.json();
+      setImportResult(`Successfully imported ${imported.length} employees`);
+      setEmployees((prev) => [...imported, ...prev]);
+      setCsvFile(null);
+    } catch (err) {
+      setImportResult(err instanceof Error ? err.message : "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  }
 
-  const filtered = employees.filter(
-    (e) =>
-      `${e.firstName} ${e.lastName} ${e.email} ${e.department} ${e.employeeId}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
+  const filtered = employees.filter((e) =>
+    `${e.firstName} ${e.lastName} ${e.email} ${e.department} ${e.employeeId}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
   );
 
   return (
@@ -174,7 +210,9 @@ function EmployeesPage() {
       <main className="flex-1 px-8 py-8">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">Directory</div>
+            <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
+              Directory
+            </div>
             <h1 className="font-display text-3xl font-extrabold tracking-tight">Employees</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -187,15 +225,46 @@ function EmployeesPage() {
               className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
             />
             {canCreate && (
-              <button
-                onClick={() => {
-                  setIsAdding(true);
-                  setError("");
-                }}
-                className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
-              >
-                + Add Employee
-              </button>
+              <>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    id="csv-input"
+                    className="hidden"
+                    onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                  />
+                  <button
+                    onClick={() => document.getElementById("csv-input")?.click()}
+                    className="px-3 py-2 text-xs font-semibold border border-border rounded-sm hover:bg-secondary transition-colors cursor-pointer"
+                  >
+                    Import CSV
+                  </button>
+                  {csvFile && (
+                    <button
+                      onClick={handleCsvImport}
+                      disabled={importing}
+                      className="px-3 py-2 text-xs font-semibold bg-primary text-white rounded-sm hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {importing ? "Importing…" : `Upload ${csvFile.name}`}
+                    </button>
+                  )}
+                </div>
+                {importResult && (
+                  <div className={`text-xs ${importResult.includes("Successfully") ? "text-green-600" : "text-red-600"}`}>
+                    {importResult}
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setIsAdding(true);
+                    setError("");
+                  }}
+                  className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
+                >
+                  + Add Employee
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -211,7 +280,7 @@ function EmployeesPage() {
                 &times;
               </button>
               <h2 className="font-display text-xl font-extrabold mb-4">Add New Employee</h2>
-              
+
               {error && (
                 <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/20 text-sm text-destructive">
                   {error}
@@ -221,7 +290,9 @@ function EmployeesPage() {
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Employee ID</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Employee ID
+                    </label>
                     <input
                       type="text"
                       required
@@ -232,7 +303,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Status</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Status
+                    </label>
                     <select
                       value={newEmp.status}
                       onChange={(e) => setNewEmp({ ...newEmp, status: e.target.value })}
@@ -248,7 +321,9 @@ function EmployeesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">First Name</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      First Name
+                    </label>
                     <input
                       type="text"
                       required
@@ -259,7 +334,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Last Name</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Last Name
+                    </label>
                     <input
                       type="text"
                       required
@@ -273,7 +350,9 @@ function EmployeesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Email</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Email
+                    </label>
                     <input
                       type="email"
                       required
@@ -284,7 +363,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Phone</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Phone
+                    </label>
                     <input
                       type="text"
                       value={newEmp.phone}
@@ -297,7 +378,9 @@ function EmployeesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Department</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Department
+                    </label>
                     <input
                       type="text"
                       value={newEmp.department}
@@ -307,7 +390,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Position</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Position
+                    </label>
                     <input
                       type="text"
                       value={newEmp.position}
@@ -320,7 +405,9 @@ function EmployeesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Salary ($)</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Salary ($)
+                    </label>
                     <input
                       type="number"
                       value={newEmp.salary}
@@ -330,7 +417,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Hire Date</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Hire Date
+                    </label>
                     <input
                       type="date"
                       required
@@ -343,7 +432,9 @@ function EmployeesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Experience Letter (PDF)</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Experience Letter (PDF)
+                    </label>
                     <input
                       type="file"
                       accept=".pdf"
@@ -352,7 +443,9 @@ function EmployeesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono uppercase text-muted-foreground">Graduation Certificate (PDF)</label>
+                    <label className="text-xs font-mono uppercase text-muted-foreground">
+                      Graduation Certificate (PDF)
+                    </label>
                     <input
                       type="file"
                       accept=".pdf"
@@ -393,11 +486,16 @@ function EmployeesPage() {
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
-                  {["ID", "Name", "Department", "Position", "Status", "Documents", "Hire Date"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {h}
-                    </th>
-                  ))}
+                  {["ID", "Name", "Department", "Position", "Status", "Documents", "Hire Date"].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                      >
+                        {h}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -410,15 +508,21 @@ function EmployeesPage() {
                 )}
                 {filtered.map((emp) => (
                   <tr key={emp.id} className="hover:bg-foreground/[0.02] transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{emp.employeeId}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {emp.employeeId}
+                    </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium">{emp.firstName} {emp.lastName}</div>
+                      <div className="font-medium">
+                        {emp.firstName} {emp.lastName}
+                      </div>
                       <div className="text-xs text-muted-foreground">{emp.email}</div>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{emp.department || "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{emp.position || "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[emp.status] ?? ""}`}>
+                      <span
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[emp.status] ?? ""}`}
+                      >
                         {emp.status}
                       </span>
                     </td>
@@ -426,28 +530,41 @@ function EmployeesPage() {
                       <div className="flex flex-col gap-1.5">
                         {emp.experienceLetterName ? (
                           <button
-                            onClick={() => downloadFile(emp.id, "experience-letter", emp.experienceLetterName!)}
+                            onClick={() =>
+                              downloadFile(emp.id, "experience-letter", emp.experienceLetterName!)
+                            }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
                             📄 Exp Letter
                           </button>
                         ) : (
-                          <span className="text-[10px] text-muted-foreground font-mono">No Exp Letter</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            No Exp Letter
+                          </span>
                         )}
                         {emp.graduationCertificateName ? (
                           <button
-                            onClick={() => downloadFile(emp.id, "graduation-certificate", emp.graduationCertificateName!)}
+                            onClick={() =>
+                              downloadFile(
+                                emp.id,
+                                "graduation-certificate",
+                                emp.graduationCertificateName!,
+                              )
+                            }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
                             📄 Grad Cert
                           </button>
                         ) : (
-                          <span className="text-[10px] text-muted-foreground font-mono">No Grad Cert</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            No Grad Cert
+                          </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{emp.hireDate}</td>
-
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {emp.hireDate}
+                    </td>
                   </tr>
                 ))}
               </tbody>

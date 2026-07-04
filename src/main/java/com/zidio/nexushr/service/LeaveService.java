@@ -47,13 +47,22 @@ public class LeaveService {
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", dto.getEmployeeId()));
 
-        long durationDays = ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate()) + 1;
-        if (durationDays <= 0) {
-            throw new IllegalArgumentException("Leave start date must be before or equal to end date");
+        double durationDays = dto.getHalfDay() != null && dto.getHalfDay() 
+                ? 0.5 
+                : (ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate()) + 1);
+
+        if (dto.getHalfDay() != null && dto.getHalfDay()) {
+            if (!dto.getStartDate().equals(dto.getEndDate())) {
+                throw new IllegalArgumentException("Half day leave must have the same start and end date");
+            }
+        } else {
+            if (durationDays <= 0) {
+                throw new IllegalArgumentException("Leave start date must be before or equal to end date");
+            }
         }
 
         if (employee.getLeaveBalance() == null) {
-            employee.setLeaveBalance(30);
+            employee.setLeaveBalance(30.0);
         }
 
         if (durationDays > employee.getLeaveBalance()) {
@@ -68,6 +77,7 @@ public class LeaveService {
                 .leaveType(dto.getLeaveType())
                 .status(Leave.LeaveStatus.PENDING)
                 .reason(dto.getReason())
+                .halfDay(dto.getHalfDay() != null ? dto.getHalfDay() : false)
                 .build();
 
         Leave savedLeave = leaveRepository.save(leave);
@@ -113,24 +123,26 @@ public class LeaveService {
         }
 
         Employee employee = leave.getEmployee();
-        long durationDays = ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1;
+        double durationDays = leave.getHalfDay() != null && leave.getHalfDay()
+                ? 0.5
+                : (ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1);
 
         if (newStatus == Leave.LeaveStatus.APPROVED) {
             if (employee.getLeaveBalance() == null) {
-                employee.setLeaveBalance(30);
+                employee.setLeaveBalance(30.0);
             }
             if (durationDays > employee.getLeaveBalance()) {
                 throw new IllegalArgumentException("Cannot approve leave. Employee has insufficient balance (" 
                         + employee.getLeaveBalance() + " days).");
             }
-            employee.setLeaveBalance(employee.getLeaveBalance() - Math.toIntExact(durationDays));
+            employee.setLeaveBalance(employee.getLeaveBalance() - durationDays);
             employeeRepository.save(employee);
         } else if (oldStatus == Leave.LeaveStatus.APPROVED 
                 && (newStatus == Leave.LeaveStatus.CANCELLED || newStatus == Leave.LeaveStatus.REJECTED)) {
             if (employee.getLeaveBalance() == null) {
-                employee.setLeaveBalance(30);
+                employee.setLeaveBalance(30.0);
             }
-            employee.setLeaveBalance(employee.getLeaveBalance() + Math.toIntExact(durationDays));
+            employee.setLeaveBalance(employee.getLeaveBalance() + durationDays);
             employeeRepository.save(employee);
         }
 
@@ -165,17 +177,39 @@ public class LeaveService {
     }
 
     @Transactional
+    public List<LeaveDTO> batchUpdateStatus(List<Long> ids, String statusStr) {
+        List<LeaveDTO> results = new java.util.ArrayList<>();
+        List<String> errors = new java.util.ArrayList<>();
+        
+        for (Long id : ids) {
+            try {
+                results.add(updateLeaveStatus(id, statusStr));
+            } catch (Exception e) {
+                errors.add("Leave " + id + ": " + e.getMessage());
+            }
+        }
+        
+        if (!errors.isEmpty()) {
+            throw new RuntimeException("Batch operation completed with " + errors.size() + " error(s): " + String.join("; ", errors));
+        }
+        
+        return results;
+    }
+
+    @Transactional
     public void deleteLeave(Long id) {
         Leave leave = leaveRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Leave", "id", id));
 
         if (leave.getStatus() == Leave.LeaveStatus.APPROVED) {
             Employee employee = leave.getEmployee();
-            long durationDays = ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1;
+            double durationDays = leave.getHalfDay() != null && leave.getHalfDay()
+                    ? 0.5
+                    : (ChronoUnit.DAYS.between(leave.getStartDate(), leave.getEndDate()) + 1);
             if (employee.getLeaveBalance() == null) {
-                employee.setLeaveBalance(30);
+                employee.setLeaveBalance(30.0);
             }
-            employee.setLeaveBalance(employee.getLeaveBalance() + (int) durationDays);
+            employee.setLeaveBalance(employee.getLeaveBalance() + durationDays);
             employeeRepository.save(employee);
         }
 

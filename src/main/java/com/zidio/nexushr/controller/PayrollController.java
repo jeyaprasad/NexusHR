@@ -41,6 +41,12 @@ public class PayrollController {
         return ResponseEntity.ok(payrollService.createPayroll(dto));
     }
 
+    @PostMapping("/batch")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    public ResponseEntity<List<PayrollDTO>> processBatchPayroll(@RequestParam String payPeriod) {
+        return ResponseEntity.ok(payrollService.processBatchPayroll(payPeriod));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<PayrollDTO> updatePayroll(@PathVariable Long id, @RequestBody PayrollDTO dto) {
