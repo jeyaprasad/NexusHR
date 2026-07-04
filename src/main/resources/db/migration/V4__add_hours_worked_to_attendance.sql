@@ -1,0 +1,1 @@
+ALTER TABLE attendance ADD COLUMN hours_worked DOUBLE PRECISION;
