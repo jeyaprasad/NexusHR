@@ -9,7 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import com.zidio.nexushr.service.AuthService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,7 +22,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
-    private final StringRedisTemplate redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -32,12 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             // Check if token is blacklisted
-            boolean isBlacklisted = false;
-            try {
-                isBlacklisted = Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
-            } catch (Exception e) {
-                logger.warn("Redis connection failed. Skipping token blacklist check: " + e.getMessage());
-            }
+            boolean isBlacklisted = AuthService.blacklistedTokens.contains(token);
             if (isBlacklisted) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been revoked");
                 return;

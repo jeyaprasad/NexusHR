@@ -5,12 +5,6 @@ databases:
     user: nexushr_user
 
 services:
-  # 2. Redis Cache
-  - type: redis
-    name: nexushr-redis
-    maxmemoryPolicy: noeviction
-    ipAllowList: [] # Deny all external traffic; only internal Render services can access this
-
   # 3. Spring Boot Backend
   - type: web
     name: nexushr-backend
@@ -25,16 +19,6 @@ services:
         fromDatabase:
           name: nexushr-db
           property: connectionString
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          type: redis
-          name: nexushr-redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          type: redis
-          name: nexushr-redis
-          property: port
       - key: OPENAI_API_KEY
         sync: false # You will need to manually add this in the Render dashboard
 

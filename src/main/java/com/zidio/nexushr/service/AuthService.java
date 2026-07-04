@@ -15,11 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final StringRedisTemplate redisTemplate;
+
+    // In-memory fallback since Redis is disabled
+    private final Map<String, String> refreshTokens = new ConcurrentHashMap<>();
+    public static final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -54,11 +58,7 @@ public class AuthService {
         );
         String token = jwtTokenProvider.generateToken(authentication);
         String refreshToken = UUID.randomUUID().toString();
-        try {
-            redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.warn("Redis connection failed. Refresh token not stored in Redis: {}", e.getMessage());
-        }
+        refreshTokens.put(refreshToken, user.getEmail());
 
         return AuthResponse.builder()
                 .token(token)
@@ -78,11 +78,7 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(authentication);
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         String refreshToken = UUID.randomUUID().toString();
-        try {
-            redisTemplate.opsForValue().set("refresh:" + refreshToken, user.getEmail(), 7, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.warn("Redis connection failed. Refresh token not stored in Redis: {}", e.getMessage());
-        }
+        refreshTokens.put(refreshToken, user.getEmail());
 
         return AuthResponse.builder()
                 .token(token)
@@ -94,13 +90,8 @@ public class AuthService {
                 .build();
     }
 
-    public AuthResponse refreshToken(String refreshToken) {
-        String email = null;
-        try {
-            email = redisTemplate.opsForValue().get("refresh:" + refreshToken);
-        } catch (Exception e) {
-            log.warn("Redis connection failed on token lookup: {}", e.getMessage());
-        }
+    public AuthResponse refreshToken(String refreshTokenStr) {
+        String email = refreshTokens.get(refreshTokenStr);
         if (email == null) {
             throw new IllegalArgumentException("Invalid or expired refresh token");
         }
@@ -112,12 +103,9 @@ public class AuthService {
         );
         String newToken = jwtTokenProvider.generateToken(authentication);
         String newRefreshToken = UUID.randomUUID().toString();
-        try {
-            redisTemplate.delete("refresh:" + refreshToken);
-            redisTemplate.opsForValue().set("refresh:" + newRefreshToken, user.getEmail(), 7, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.warn("Redis connection failed. New refresh token not updated: {}", e.getMessage());
-        }
+        
+        refreshTokens.remove(refreshTokenStr);
+        refreshTokens.put(newRefreshToken, user.getEmail());
 
         return AuthResponse.builder()
                 .token(newToken)
@@ -133,10 +121,8 @@ public class AuthService {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        try {
-            redisTemplate.opsForValue().set("blacklist:" + token, "revoked", 24, TimeUnit.HOURS);
-        } catch (Exception e) {
-            log.warn("Redis connection failed. Token not blacklisted: {}", e.getMessage());
+        if (token != null) {
+            blacklistedTokens.add(token);
         }
     }
 }
