@@ -48,7 +48,8 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  const res = await fetch(path, { ...options, headers });
+  const baseURL = import.meta.env.VITE_API_URL || "";
+  const res = await fetch(`${baseURL}${path}`, { ...options, headers });
   if (res.status === 401) {
     logout();
   }
