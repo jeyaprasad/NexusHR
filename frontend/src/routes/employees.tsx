@@ -19,8 +19,10 @@ type Employee = {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   department: string;
   position: string;
+  salary?: number;
   status: string;
   hireDate: string;
   experienceLetterName?: string;
@@ -39,10 +41,11 @@ function EmployeesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Create Employee states
+  // Create / Edit Employee states
   const [isAdding, setIsAdding] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [error, setError] = useState("");
-  const [newEmp, setNewEmp] = useState({
+  const [formEmp, setFormEmp] = useState({
     employeeId: "",
     firstName: "",
     lastName: "",
@@ -57,6 +60,9 @@ function EmployeesPage() {
 
   const [expLetterFile, setExpLetterFile] = useState<File | null>(null);
   const [gradCertFile, setGradCertFile] = useState<File | null>(null);
+
+  // Document upload per employee
+  const [uploadingFor, setUploadingFor] = useState<number | null>(null);
 
   // CSV import
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -81,70 +87,183 @@ function EmployeesPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  async function handleCreate(e: React.FormEvent) {
+  async function refetchEmployees() {
+    try {
+      const res = await apiFetch("/api/employees?page=0&size=50");
+      if (res.ok) {
+        const d = await res.json();
+        setEmployees(Array.isArray(d) ? d : (d.content ?? []));
+      }
+    } catch (err) {
+      console.error("Failed to refetch employees", err);
+    }
+  }
+
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    const isEdit = editingId !== null;
+    const body = { ...formEmp, salary: formEmp.salary ? Number(formEmp.salary) : 0 };
+
     try {
-      const res = await apiFetch("/api/employees", {
-        method: "POST",
-        body: JSON.stringify({
-          ...newEmp,
-          salary: newEmp.salary ? Number(newEmp.salary) : 0,
-        }),
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Failed to create employee");
-      }
-      const created = await res.json();
-
-      if (expLetterFile || gradCertFile) {
-        const formData = new FormData();
-        if (expLetterFile) {
-          formData.append("experienceLetter", expLetterFile);
-        }
-        if (gradCertFile) {
-          formData.append("graduationCertificate", gradCertFile);
-        }
-
-        const token = localStorage.getItem("nexushr_token");
-        const uploadRes = await fetch(`/api/employees/${created.id}/documents`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
+      if (isEdit) {
+        const res = await apiFetch(`/api/employees/${editingId}`, {
+          method: "PUT",
+          body: JSON.stringify(body),
         });
-
-        if (!uploadRes.ok) {
-          const errData = await uploadRes.json().catch(() => ({}));
-          throw new Error(errData.message || "Employee created, but failed to upload documents");
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || "Failed to update employee");
         }
-        const updated = await uploadRes.json();
-        setEmployees((prev) => [updated, ...prev]);
       } else {
-        setEmployees((prev) => [created, ...prev]);
-      }
+        const res = await apiFetch("/api/employees", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || "Failed to create employee");
+        }
+        const created = await res.json();
 
-      setIsAdding(false);
-      setExpLetterFile(null);
-      setGradCertFile(null);
-      setNewEmp({
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        department: "",
-        position: "",
-        salary: "",
-        hireDate: new Date().toISOString().split("T")[0],
-        status: "ACTIVE",
-      });
+        if (expLetterFile || gradCertFile) {
+          const formData = new FormData();
+          if (expLetterFile) formData.append("experienceLetter", expLetterFile);
+          if (gradCertFile) formData.append("graduationCertificate", gradCertFile);
+          const token = localStorage.getItem("nexushr_token");
+          const uploadRes = await fetch(`/api/employees/${created.id}/documents`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          });
+          if (!uploadRes.ok) {
+            const errData = await uploadRes.json().catch(() => ({}));
+            throw new Error(errData.message || "Employee created, but failed to upload documents");
+          }
+        }
+      }
+      closeForm();
+      await refetchEmployees();
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to create employee";
+      const errorMsg = err instanceof Error ? err.message : "Failed to save employee";
       setError(errorMsg);
     }
+  }
+
+  function openAddForm() {
+    setEditingId(null);
+    setFormEmp({
+      employeeId: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      department: "",
+      position: "",
+      salary: "",
+      hireDate: new Date().toISOString().split("T")[0],
+      status: "ACTIVE",
+    });
+    setExpLetterFile(null);
+    setGradCertFile(null);
+    setError("");
+    setIsAdding(true);
+  }
+
+  function openEditForm(emp: Employee) {
+    setEditingId(emp.id);
+    setFormEmp({
+      employeeId: emp.employeeId,
+      firstName: emp.firstName,
+      lastName: emp.lastName,
+      email: emp.email,
+      department: emp.department,
+      position: emp.position,
+      salary: emp.salary != null ? String(emp.salary) : "",
+      hireDate: emp.hireDate,
+      status: emp.status,
+      phone: emp.phone ?? "",
+    });
+    setExpLetterFile(null);
+    setGradCertFile(null);
+    setError("");
+    setIsAdding(true);
+  }
+
+  function closeForm() {
+    setIsAdding(false);
+    setEditingId(null);
+    setExpLetterFile(null);
+    setGradCertFile(null);
+    setFormEmp({
+      employeeId: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      department: "",
+      position: "",
+      salary: "",
+      hireDate: new Date().toISOString().split("T")[0],
+      status: "ACTIVE",
+    });
+  }
+
+  async function handleDelete(id: number) {
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
+    try {
+      const res = await apiFetch(`/api/employees/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete employee");
+      setEmployees((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete employee");
+    }
+  }
+
+  function uploadDoc(empId: number, field: "experienceLetter" | "graduationCertificate") {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `/api/employees/${empId}/documents`;
+    form.enctype = "multipart/form-data";
+    form.style.display = "none";
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.name = field;
+    fileInput.accept = ".pdf";
+    form.appendChild(fileInput);
+
+    document.body.appendChild(form);
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      document.body.removeChild(form);
+      if (!file) return;
+
+      setUploadingFor(empId);
+      try {
+        const fd = new FormData(form);
+        const token = localStorage.getItem("nexushr_token");
+        const res = await fetch(form.action, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        if (!res.ok) {
+          let errMsg = "Upload failed";
+          try { const d = await res.json(); errMsg = d.message || d.error || errMsg } catch {}
+          throw new Error(`${errMsg} (${res.status})`);
+        }
+        await refetchEmployees();
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert(err instanceof Error ? err.message : "Upload failed");
+      } finally {
+        setUploadingFor(null);
+      }
+    });
+
+    fileInput.click();
   }
 
   async function downloadFile(
@@ -256,10 +375,7 @@ function EmployeesPage() {
                   </div>
                 )}
                 <button
-                  onClick={() => {
-                    setIsAdding(true);
-                    setError("");
-                  }}
+                  onClick={openAddForm}
                   className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
                 >
                   + Add Employee
@@ -269,17 +385,19 @@ function EmployeesPage() {
           </div>
         </div>
 
-        {/* Create Employee Modal */}
+        {/* Create / Edit Employee Modal */}
         {isAdding && (
           <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-card border border-border w-full max-w-lg rounded-lg shadow-2xl p-6 relative">
               <button
-                onClick={() => setIsAdding(false)}
+                onClick={closeForm}
                 className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xl cursor-pointer"
               >
                 &times;
               </button>
-              <h2 className="font-display text-xl font-extrabold mb-4">Add New Employee</h2>
+              <h2 className="font-display text-xl font-extrabold mb-4">
+                {editingId !== null ? "Edit Employee" : "Add New Employee"}
+              </h2>
 
               {error && (
                 <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/20 text-sm text-destructive">
@@ -287,7 +405,7 @@ function EmployeesPage() {
                 </div>
               )}
 
-              <form onSubmit={handleCreate} className="space-y-4">
+              <form onSubmit={handleSave} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-mono uppercase text-muted-foreground">
@@ -296,8 +414,8 @@ function EmployeesPage() {
                     <input
                       type="text"
                       required
-                      value={newEmp.employeeId}
-                      onChange={(e) => setNewEmp({ ...newEmp, employeeId: e.target.value })}
+                      value={formEmp.employeeId}
+                      onChange={(e) => setFormEmp({ ...formEmp, employeeId: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="EMP005"
                     />
@@ -307,8 +425,8 @@ function EmployeesPage() {
                       Status
                     </label>
                     <select
-                      value={newEmp.status}
-                      onChange={(e) => setNewEmp({ ...newEmp, status: e.target.value })}
+                      value={formEmp.status}
+                      onChange={(e) => setFormEmp({ ...formEmp, status: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     >
                       <option value="ACTIVE">ACTIVE</option>
@@ -327,8 +445,8 @@ function EmployeesPage() {
                     <input
                       type="text"
                       required
-                      value={newEmp.firstName}
-                      onChange={(e) => setNewEmp({ ...newEmp, firstName: e.target.value })}
+                      value={formEmp.firstName}
+                      onChange={(e) => setFormEmp({ ...formEmp, firstName: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Jane"
                     />
@@ -340,8 +458,8 @@ function EmployeesPage() {
                     <input
                       type="text"
                       required
-                      value={newEmp.lastName}
-                      onChange={(e) => setNewEmp({ ...newEmp, lastName: e.target.value })}
+                      value={formEmp.lastName}
+                      onChange={(e) => setFormEmp({ ...formEmp, lastName: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Smith"
                     />
@@ -356,8 +474,8 @@ function EmployeesPage() {
                     <input
                       type="email"
                       required
-                      value={newEmp.email}
-                      onChange={(e) => setNewEmp({ ...newEmp, email: e.target.value })}
+                      value={formEmp.email}
+                      onChange={(e) => setFormEmp({ ...formEmp, email: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="jane.smith@company.com"
                     />
@@ -368,8 +486,8 @@ function EmployeesPage() {
                     </label>
                     <input
                       type="text"
-                      value={newEmp.phone}
-                      onChange={(e) => setNewEmp({ ...newEmp, phone: e.target.value })}
+                      value={formEmp.phone}
+                      onChange={(e) => setFormEmp({ ...formEmp, phone: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="1234567890"
                     />
@@ -383,8 +501,8 @@ function EmployeesPage() {
                     </label>
                     <input
                       type="text"
-                      value={newEmp.department}
-                      onChange={(e) => setNewEmp({ ...newEmp, department: e.target.value })}
+                      value={formEmp.department}
+                      onChange={(e) => setFormEmp({ ...formEmp, department: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Engineering"
                     />
@@ -395,8 +513,8 @@ function EmployeesPage() {
                     </label>
                     <input
                       type="text"
-                      value={newEmp.position}
-                      onChange={(e) => setNewEmp({ ...newEmp, position: e.target.value })}
+                      value={formEmp.position}
+                      onChange={(e) => setFormEmp({ ...formEmp, position: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Senior Developer"
                     />
@@ -410,8 +528,8 @@ function EmployeesPage() {
                     </label>
                     <input
                       type="number"
-                      value={newEmp.salary}
-                      onChange={(e) => setNewEmp({ ...newEmp, salary: e.target.value })}
+                      value={formEmp.salary}
+                      onChange={(e) => setFormEmp({ ...formEmp, salary: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="90000"
                     />
@@ -423,8 +541,8 @@ function EmployeesPage() {
                     <input
                       type="date"
                       required
-                      value={newEmp.hireDate}
-                      onChange={(e) => setNewEmp({ ...newEmp, hireDate: e.target.value })}
+                      value={formEmp.hireDate}
+                      onChange={(e) => setFormEmp({ ...formEmp, hireDate: e.target.value })}
                       className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     />
                   </div>
@@ -458,11 +576,7 @@ function EmployeesPage() {
                 <div className="mt-6 flex justify-end gap-2 pt-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsAdding(false);
-                      setExpLetterFile(null);
-                      setGradCertFile(null);
-                    }}
+                    onClick={closeForm}
                     className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-sm transition-colors cursor-pointer"
                   >
                     Cancel
@@ -471,7 +585,7 @@ function EmployeesPage() {
                     type="submit"
                     className="px-4 py-2.5 text-sm font-medium bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
                   >
-                    Save Employee
+                    {editingId !== null ? "Update Employee" : "Save Employee"}
                   </button>
                 </div>
               </form>
@@ -486,7 +600,7 @@ function EmployeesPage() {
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
-                  {["ID", "Name", "Department", "Position", "Status", "Documents", "Hire Date"].map(
+                  {["ID", "Name", "Department", "Position", "Status", "Documents", "Hire Date", "Actions"].map(
                     (h) => (
                       <th
                         key={h}
@@ -501,7 +615,7 @@ function EmployeesPage() {
               <tbody className="divide-y divide-border">
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">
+                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-sm">
                       No employees found.
                     </td>
                   </tr>
@@ -535,12 +649,21 @@ function EmployeesPage() {
                             }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            📄 Exp Letter
+                            📄 {emp.experienceLetterName}
                           </button>
                         ) : (
                           <span className="text-[10px] text-muted-foreground font-mono">
                             No Exp Letter
                           </span>
+                        )}
+                        {canCreate && !emp.experienceLetterName && (
+                          <button
+                            onClick={() => uploadDoc(emp.id, "experienceLetter")}
+                            disabled={uploadingFor === emp.id}
+                            className="text-left text-[10px] text-muted-foreground hover:text-primary hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            {uploadingFor === emp.id ? "Uploading…" : "+ Upload Exp Letter"}
+                          </button>
                         )}
                         {emp.graduationCertificateName ? (
                           <button
@@ -553,17 +676,46 @@ function EmployeesPage() {
                             }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            📄 Grad Cert
+                            📄 {emp.graduationCertificateName}
                           </button>
                         ) : (
                           <span className="text-[10px] text-muted-foreground font-mono">
                             No Grad Cert
                           </span>
                         )}
+                        {canCreate && !emp.graduationCertificateName && (
+                          <button
+                            onClick={() => uploadDoc(emp.id, "graduationCertificate")}
+                            disabled={uploadingFor === emp.id}
+                            className="text-left text-[10px] text-muted-foreground hover:text-primary hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            {uploadingFor === emp.id ? "Uploading…" : "+ Upload Grad Cert"}
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                       {emp.hireDate}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {canCreate && (
+                          <button
+                            onClick={() => openEditForm(emp)}
+                            className="text-xs text-primary hover:underline font-semibold cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {user?.role === "ADMIN" && (
+                          <button
+                            onClick={() => handleDelete(emp.id)}
+                            className="text-xs text-destructive hover:underline font-semibold cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

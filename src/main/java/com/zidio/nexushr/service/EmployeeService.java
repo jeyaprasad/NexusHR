@@ -102,6 +102,7 @@ public class EmployeeService {
                 .toList();
     }
 
+    @CacheEvict(value = {"employees", "employeeById", "employeeByDept", "dashboard"}, allEntries = true)
     public EmployeeDTO uploadDocuments(Long id, MultipartFile experienceLetter, MultipartFile graduationCertificate) throws IOException {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));

@@ -60,7 +60,7 @@ public class Employee {
 
     private LocalDateTime updatedAt;
 
-    @Column(name = "experience_letter_data")
+    @Column(name = "experience_letter_data", columnDefinition = "BYTEA")
     private byte[] experienceLetterData;
 
     @Column(name = "experience_letter_name")
@@ -69,7 +69,7 @@ public class Employee {
     @Column(name = "experience_letter_content_type")
     private String experienceLetterContentType;
 
-    @Column(name = "graduation_certificate_data")
+    @Column(name = "graduation_certificate_data", columnDefinition = "BYTEA")
     private byte[] graduationCertificateData;
 
     @Column(name = "graduation_certificate_name")
