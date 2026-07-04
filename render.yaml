@@ -1,7 +1,6 @@
 databases:
   # 1. PostgreSQL Database
   - name: nexushr-db
-    plan: free # Change to starter/standard for production
     databaseName: nexushr
     user: nexushr_user
 
@@ -9,7 +8,6 @@ services:
   # 2. Redis Cache
   - type: redis
     name: nexushr-redis
-    plan: free # Change to standard for production
     maxmemoryPolicy: noeviction
     ipAllowList: [] # Deny all external traffic; only internal Render services can access this
 
@@ -17,7 +15,6 @@ services:
   - type: web
     name: nexushr-backend
     env: docker
-    plan: free # Change to starter/standard for production
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
     envVars:
@@ -45,7 +42,6 @@ services:
   - type: web
     name: nexushr-frontend
     env: static
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
     envVars:
