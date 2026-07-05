@@ -14,6 +14,17 @@ serve({
       return new Response(file);
     }
     
+    // Proxy /api requests to backend so frontend doesn't need to be rebuilt for absolute URLs
+    if (url.pathname.startsWith("/api/")) {
+      const backendUrl = process.env.API_URL || "https://nexus-hr.onrender.com";
+      const proxyReq = new Request(backendUrl + url.pathname + url.search, {
+        method: req.method,
+        headers: req.headers,
+        body: req.body
+      });
+      return fetch(proxyReq);
+    }
+    
     // Otherwise fallback to the TanStack Start SSR handler
     return ssr.fetch(req);
   },
