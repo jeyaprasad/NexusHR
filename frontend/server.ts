@@ -17,7 +17,7 @@ serve({
     
     // Proxy /api requests to backend so frontend doesn't need to be rebuilt for absolute URLs
     if (url.pathname.startsWith("/api/")) {
-      let backendUrl = "https://nexus-hr-3n2v.onrender.com";
+      let backendUrl = process.env.API_URL || "http://nexushr-backend:8080";
       if (backendUrl.endsWith("/")) {
         backendUrl = backendUrl.slice(0, -1);
       }
