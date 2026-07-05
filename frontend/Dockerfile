@@ -18,10 +18,13 @@ RUN bun run build
 FROM oven/bun:1-alpine AS runtime
 WORKDIR /app
 
-# Only copy the built assets and dependencies
+# Copy package files and install production dependencies directly
+# This prevents broken symlink issues from Bun's global cache
+COPY package.json bun.lock ./
+RUN bun install --production
+
+# Only copy the built assets
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
 ENV PORT=3000
