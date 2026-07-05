@@ -25,6 +25,9 @@ serve({
       // We MUST delete the Host header, otherwise Render routes it right back to the frontend (508 Loop Detected)
       const headers = new Headers(req.headers);
       headers.delete("host");
+      // Delete origin and referer to bypass Spring Boot CORS checks, since this is a server-to-server proxy request
+      headers.delete("origin");
+      headers.delete("referer");
       
       const proxyReq = new Request(backendUrl + url.pathname + url.search, {
         method: req.method,
