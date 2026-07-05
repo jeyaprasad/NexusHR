@@ -17,7 +17,10 @@ serve({
     
     // Proxy /api requests to backend so frontend doesn't need to be rebuilt for absolute URLs
     if (url.pathname.startsWith("/api/")) {
-      const backendUrl = process.env.VITE_API_URL || process.env.API_URL || "https://nexus-hr.onrender.com";
+      let backendUrl = process.env.VITE_API_URL || process.env.API_URL || "https://nexushr-backend.onrender.com";
+      if (backendUrl.endsWith("/")) {
+        backendUrl = backendUrl.slice(0, -1);
+      }
       
       // We MUST delete the Host header, otherwise Render routes it right back to the frontend (508 Loop Detected)
       const headers = new Headers(req.headers);
