@@ -12,7 +12,6 @@ services:
     plan: free
     env: docker
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
