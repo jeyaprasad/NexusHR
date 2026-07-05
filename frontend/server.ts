@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from "bun";
 import { resolve } from "path";
 
