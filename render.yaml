@@ -50,13 +50,8 @@ services:
     envVars:
       - key: PORT
         value: 3000
-      - key: API_HOST
+      - key: API_URL
         fromService:
           type: web
           name: nexushr-backend
-          property: host
-      - key: API_PORT
-        fromService:
-          type: web
-          name: nexushr-backend
-          property: port
+          envVarKey: RENDER_EXTERNAL_URL
