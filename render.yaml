@@ -37,7 +37,9 @@ services:
           name: nexushr-db
           property: password
       - key: HUGGINGFACE_API_TOKEN
-        sync: false # You will need to manually add this in the Render dashboard
+        sync: false
+      - key: PORT
+        value: 8080
 
   # 4. React 19 Frontend
   - type: web
@@ -45,3 +47,8 @@ services:
     plan: free
     env: docker
     rootDir: frontend
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: API_URL
+        value: http://nexushr-backend:8080
