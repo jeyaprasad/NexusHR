@@ -18,5 +18,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Bun automatically runs files exporting `fetch` as an HTTP server
-CMD ["bun", "run", "dist/server/server.js"]
+# Run the custom server to serve both static assets and SSR
+CMD ["bun", "run", "server.ts"]
