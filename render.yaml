@@ -50,5 +50,13 @@ services:
     envVars:
       - key: PORT
         value: 3000
-      - key: API_URL
-        value: http://nexushr-backend:8080
+      - key: API_HOST
+        fromService:
+          type: web
+          name: nexushr-backend
+          property: host
+      - key: API_PORT
+        fromService:
+          type: web
+          name: nexushr-backend
+          property: port

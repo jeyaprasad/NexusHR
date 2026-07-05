@@ -17,7 +17,14 @@ serve({
     
     // Proxy /api requests to backend so frontend doesn't need to be rebuilt for absolute URLs
     if (url.pathname.startsWith("/api/")) {
-      let backendUrl = process.env.API_URL || "http://nexushr-backend:8080";
+      let backendUrl = process.env.API_URL;
+      if (!backendUrl) {
+        if (process.env.API_HOST && process.env.API_PORT) {
+          backendUrl = `http://${process.env.API_HOST}:${process.env.API_PORT}`;
+        } else {
+          backendUrl = "http://nexushr-backend:8080";
+        }
+      }
       if (backendUrl.endsWith("/")) {
         backendUrl = backendUrl.slice(0, -1);
       }
