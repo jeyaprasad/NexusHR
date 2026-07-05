@@ -21,7 +21,7 @@ WORKDIR /app
 # Copy package files and install production dependencies directly
 # This prevents broken symlink issues from Bun's global cache
 COPY package.json bun.lock ./
-RUN bun install --production
+RUN bun install --production --frozen-lockfile=false
 
 # Only copy the built assets
 COPY --from=builder /app/dist ./dist
