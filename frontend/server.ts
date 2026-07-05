@@ -29,12 +29,32 @@ serve({
       headers.delete("origin");
       headers.delete("referer");
       
+      let reqBody = null;
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        reqBody = await req.arrayBuffer();
+      }
+      
       const proxyReq = new Request(backendUrl + url.pathname + url.search, {
         method: req.method,
         headers: headers,
-        body: req.body
+        body: reqBody
       });
-      return fetch(proxyReq);
+      
+      try {
+        const proxyRes = await fetch(proxyReq);
+        const resBody = await proxyRes.arrayBuffer();
+        
+        return new Response(resBody, {
+          status: proxyRes.status,
+          headers: proxyRes.headers
+        });
+      } catch (err) {
+        console.error("Proxy error:", err);
+        return new Response(JSON.stringify({ error: "Proxy connection failed" }), {
+          status: 502,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
     }
     
     // Otherwise fallback to the TanStack Start SSR handler
