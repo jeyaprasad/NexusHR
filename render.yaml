@@ -22,17 +22,8 @@ services:
       - key: HUGGINGFACE_API_TOKEN
         sync: false # You will need to manually add this in the Render dashboard
 
-  # 4. React 19 Frontend (Static Site)
+  # 4. React 19 Frontend
   - type: web
     name: nexushr-frontend
-    env: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    envVars:
-      - key: NODE_VERSION
-        value: 20
-    routes:
-      # Catch-all route to allow React Router to handle client-side routing
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    env: docker
+    rootDir: frontend
