@@ -17,7 +17,7 @@ serve({
     
     // Proxy /api requests to backend so frontend doesn't need to be rebuilt for absolute URLs
     if (url.pathname.startsWith("/api/")) {
-      let backendUrl = process.env.VITE_API_URL || process.env.API_URL || "https://nexus-hr-3n2v.onrender.com";
+      let backendUrl = "https://nexus-hr-3n2v.onrender.com";
       if (backendUrl.endsWith("/")) {
         backendUrl = backendUrl.slice(0, -1);
       }
