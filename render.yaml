@@ -16,10 +16,26 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       # Render automatically provisions these environment variables internally
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_HOST
         fromDatabase:
           name: nexushr-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: nexushr-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: nexushr-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: nexushr-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: nexushr-db
+          property: password
       - key: HUGGINGFACE_API_TOKEN
         sync: false # You will need to manually add this in the Render dashboard
 
