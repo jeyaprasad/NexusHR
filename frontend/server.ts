@@ -55,8 +55,13 @@ serve({
           headers: resHeaders
         });
       } catch (err) {
-        console.error("Proxy error:", err);
-        return new Response(JSON.stringify({ error: "Proxy connection failed" }), {
+        console.error("Proxy error for URL:", backendUrl, err);
+        const errorDetails = err instanceof Error ? err.message : String(err);
+        return new Response(JSON.stringify({ 
+          error: "Proxy connection failed", 
+          details: errorDetails,
+          target: backendUrl
+        }), {
           status: 502,
           headers: { "Content-Type": "application/json" }
         });
