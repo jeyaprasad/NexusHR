@@ -1,6 +1,7 @@
 databases:
   # 1. PostgreSQL Database
   - name: nexushr-db
+    plan: free
     databaseName: nexushr
     user: nexushr_user
 
@@ -8,6 +9,7 @@ services:
   # 3. Spring Boot Backend
   - type: web
     name: nexushr-backend
+    plan: free
     env: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
@@ -25,5 +27,6 @@ services:
   # 4. React 19 Frontend
   - type: web
     name: nexushr-frontend
+    plan: free
     env: docker
     rootDir: frontend
