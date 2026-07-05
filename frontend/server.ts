@@ -44,9 +44,15 @@ serve({
         const proxyRes = await fetch(proxyReq);
         const resBody = await proxyRes.arrayBuffer();
         
+        const resHeaders = new Headers(proxyRes.headers);
+        // Bun auto-decompresses the body, so we must remove the gzip encoding and length headers
+        // otherwise the browser will fail to decode the response and throw Failed to fetch
+        resHeaders.delete("content-encoding");
+        resHeaders.delete("content-length");
+        
         return new Response(resBody, {
           status: proxyRes.status,
-          headers: proxyRes.headers
+          headers: resHeaders
         });
       } catch (err) {
         console.error("Proxy error:", err);
