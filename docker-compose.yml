@@ -27,12 +27,19 @@ services:
     container_name: nexushr-backend
     ports:
       - "8080:8080"
+    volumes:
+      - onnx-cache:/tmp/spring-ai-onnx-generative
     environment:
-      - SPRING_PROFILES_ACTIVE=prod  # Use Postgres configuration
+      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/nexushr
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
       - OPENAI_API_KEY=${OPENAI_API_KEY:-mock-key}
+      - GROQ_API_KEY=${GROQ_API_KEY:-mock-key}
       - SENTRY_DSN=${SENTRY_DSN:-}
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_AI=DEBUG
     depends_on:
       - db
       - redis
@@ -83,3 +90,4 @@ volumes:
   pgdata:
   prometheus_data:
   grafana_data:
+  onnx-cache:

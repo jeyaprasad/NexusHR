@@ -1,9 +1,13 @@
 package com.zidio.nexushr.controller;
 
+import com.zidio.nexushr.security.CustomUserDetailsService;
+import com.zidio.nexushr.security.JwtTokenProvider;
 import com.zidio.nexushr.service.AiService;
 import com.zidio.nexushr.service.HrPolicyDocumentService;
 import com.zidio.nexushr.service.HuggingFaceService;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,6 +38,18 @@ class AiControllerIntegrationTest {
 
     @MockBean
     private HrPolicyDocumentService hrPolicyDocumentService;
+
+    @MockBean
+    private VectorStore vectorStore;
+
+    @MockBean
+    private EmbeddingModel embeddingModel;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     @WithMockUser

@@ -19,6 +19,11 @@ spring:
       chat:
         api-key: mock-key-for-testing
         url: https://api-inference.huggingface.co/models/test
+    openai:
+      api-key: ${GROQ_API_KEY:mock-key}
+      base-url: https://api.groq.com/openai
+      embedding:
+        enabled: false
   mail:
     host: localhost
     port: 1025

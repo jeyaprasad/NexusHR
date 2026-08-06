@@ -251,7 +251,7 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
 - **Leave Balance**: 30 days default per employee; deducted on approval, restored on rejection/cancellation
 - **PDF Payslips**: Generated server-side with OpenPDF, streamed directly to the browser
 - **Generative AI Features**:
-  - **Prompt-Based (Attrition/Skills)**: HuggingFace inference via Spring AI — flags flight-risk employees before vacancies occur and identifies skill gaps. Uses explicit fallback simulation when `HF_API_KEY` is not provided.
+  - **Prompt-Based (Attrition/Skills)**: Groq inference via Spring AI — flags flight-risk employees before vacancies occur and identifies skill gaps. Uses explicit fallback simulation when `GROQ_API_KEY` is not provided.
   - **RAG-Based (HR Policy Q&A)**: Uses `pgvector` for vector storage and `spring-ai-transformers` (Local ONNX Models) to embed uploaded HR policies (PDF/Text) locally. Provides highly accurate, grounded answers to employee queries. Automatically downloads the ONNX model (approx. 200MB) on first run.
 - **RBAC Hierarchy**:
   - `ADMIN` — full platform access

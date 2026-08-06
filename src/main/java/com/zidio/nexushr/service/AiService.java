@@ -16,7 +16,7 @@ public class AiService {
     private final ChatModel chatModel;
     private final org.springframework.ai.vectorstore.VectorStore vectorStore;
 
-    @org.springframework.beans.factory.annotation.Value("${spring.ai.huggingface.chat.api-key:mock-key}")
+    @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.api-key:mock-key}")
     private String apiKey;
 
     // ─── F-05: Predictive Attrition ──────────────────────────────────────────
@@ -49,22 +49,23 @@ public class AiService {
 
     // ─── RAG: HR Policy Q&A ───────────────────────────────────────────────────
     public String askHrPolicy(String question) {
-        if ("mock-key".equals(apiKey)) {
-            log.warn("AI running in fallback mode — no HF_API_KEY set.");
-            return "I couldn't find that in the policy documents, please contact HR.";
-        }
         try {
             java.util.List<org.springframework.ai.document.Document> topMatches = vectorStore.similaritySearch(
-                    org.springframework.ai.vectorstore.SearchRequest.query(question).withTopK(3));
+                    org.springframework.ai.vectorstore.SearchRequest.builder().query(question).topK(3).build());
             
             if (topMatches.isEmpty()) {
                 return "I couldn't find any relevant information in the uploaded HR policies.";
             }
             
             String context = topMatches.stream()
-                    .map(org.springframework.ai.document.Document::getContent)
+                    .map(org.springframework.ai.document.Document::getText)
                     .collect(java.util.stream.Collectors.joining("\n\n"));
             
+            if ("mock-key".equals(apiKey)) {
+                log.warn("AI running in fallback mode — returning retrieved context instead of LLM inference.");
+                return "[Fallback Mock Response] Based on the policy context retrieved:\n" + context;
+            }
+
             String promptString = "You are a helpful HR assistant. Answer the employee's question based ONLY on the following policy documents.\n\n"
                     + "Policies:\n" + context + "\n\n"
                     + "Question: " + question;
@@ -78,7 +79,7 @@ public class AiService {
 
     private String callAi(String instruction, String type, String employeeData) {
         if ("mock-key".equals(apiKey)) {
-            log.warn("AI running in fallback mode — no HF_API_KEY set.");
+            log.warn("AI running in fallback mode — no GROQ_API_KEY set.");
             return generateSimulatedResponse(type, employeeData);
         }
         try {

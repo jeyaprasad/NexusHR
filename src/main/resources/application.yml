@@ -72,10 +72,14 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
   ai:
-    huggingface:
+    openai:
+      api-key: ${GROQ_API_KEY:mock-key}
+      base-url: https://api.groq.com/openai
+      embedding:
+        enabled: false
       chat:
-        api-key: ${HF_API_KEY:mock-key}
-        url: ${HF_ENDPOINT_URL:https://api-inference.huggingface.co/models/meta-llama/Llama-3-8b-chat-hf}
+        options:
+          model: openai/gpt-oss-20b
     vectorstore:
       pgvector:
         index-type: HNSW
