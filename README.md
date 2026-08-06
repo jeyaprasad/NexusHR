@@ -63,12 +63,12 @@ docker compose up --build
 | **F-02** | Attendance & Leave Management | ✅ Complete | Real-time time tracking, geo-fencing, automated policy enforcement |
 | **F-03** | Payroll Engine | ✅ Complete | Statutory compliance, tax computations, downloadable PDF payslips |
 | **F-04** | Performance Reviews | ✅ Complete | 360° reviews, OKR tracking, continuous feedback loops |
-| **F-05** | AI Attrition Insights | ✅ Complete | Predictive modeling via HuggingFace API (Spring AI) - *Prompt-based LLM generation* |
+| **F-05** | AI Attrition Insights | ✅ Complete | Predictive modeling via Groq (Spring AI, openai/gpt-oss-20b) - *Prompt-based LLM generation* |
 | **F-06** | AI HR Policy RAG | ✅ Complete | Grounded Q&A on company policies using vector embeddings (pgvector) and Spring AI - *Retrieval-Augmented Generation* |
 | **F-07** | Dashboard & Workforce Intel | ✅ Complete | Real-time stats with role-based analytics and drill-down reports |
-| **F-07** | Notifications | ✅ Complete | Event-driven pub/sub via WebSocket for critical HR alerts |
-| **F-08** | Auth & RBAC | ✅ Complete | JWT (HS512) + refresh rotation, row-level security, field permissions |
-| **F-09** | Dark/Light Theme | ✅ Complete | Client-side toggle persisted per session |
+| **F-08** | Notifications | ✅ Complete | Event-driven pub/sub via WebSocket for critical HR alerts |
+| **F-09** | Auth & RBAC | ✅ Complete | JWT (HS512) + refresh rotation, row-level security, field permissions |
+| **F-10** | Dark/Light Theme | ✅ Complete | Client-side toggle persisted per session |
 
 ---
 
@@ -131,7 +131,7 @@ NexusHR/
 | :--- | :--- | :--- |
 | **Runtime** | Java 21 | LTS, virtual threads ready |
 | **Framework** | Spring Boot 3.3 | REST API, auto-configuration |
-| **AI / ML** | Spring AI 1.0 + HuggingFace | Attrition prediction models |
+| **AI / ML** | Spring AI 1.0 + Groq (chat) + pgvector (vector store) + ONNX (embeddings) | Attrition prediction, HR Policy RAG (HuggingFace used separately for sentiment analysis) |
 | **Database** | PostgreSQL 17 | ACID, encrypted at rest |
 | **Migrations** | Flyway | Production-safe schema migrations |
 | **Cache** | Redis 7 | Session cache + rate limiting |
@@ -235,7 +235,11 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
 ### AI Insights
 | Method | Endpoint | Description |
 | :----- | :------- | :---------- |
-| `POST` | `/api/ai/attrition` | Predict attrition risk for an employee |
+| `POST` | `/api/ai/attrition` | Predict attrition risk for an employee (ADMIN / HR) |
+| `POST` | `/api/ai/skill-gap` | Identify skill gaps for an employee (ADMIN / HR) |
+| `POST` | `/api/ai/engagement` | Analyze employee engagement and sentiment (ADMIN / HR) |
+| `POST` | `/api/ai/ask-hr` | RAG-based grounded/retrieval-augmented HR policy Q&A |
+| `POST` | `/api/ai/policy-upload` | Admin endpoint to upload and index HR policy documents into pgvector (ADMIN) |
 
 ### Notifications
 | Method | Endpoint | Description |
@@ -289,7 +293,7 @@ render.yaml
 └── nexushr-frontend  React SSR  (Dockerized, Nginx)
 ```
 
-Environment variables (DB credentials, HuggingFace API token) are injected via Render's environment system — no manual wiring required.
+Environment variables (DB credentials, GROQ_API_KEY) are injected via Render's environment system — no manual wiring required.
 
 ---
 
@@ -304,6 +308,8 @@ helm install nexushr ./helm --namespace nexushr --create-namespace
 ---
 
 ## 📊 Platform Metrics
+
+*Illustrative targets based on the platform's design capacity, not live production measurements.*
 
 | Metric | Value |
 | :----- | :---- |
