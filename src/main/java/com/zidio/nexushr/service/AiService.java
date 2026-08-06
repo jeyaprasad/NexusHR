@@ -14,6 +14,10 @@ import java.util.Map;
 public class AiService {
 
     private final ChatModel chatModel;
+    private final org.springframework.ai.vectorstore.VectorStore vectorStore;
+
+    @org.springframework.beans.factory.annotation.Value("${spring.ai.huggingface.chat.api-key:mock-key}")
+    private String apiKey;
 
     // ─── F-05: Predictive Attrition ──────────────────────────────────────────
     public String predictAttrition(String employeeData) {
@@ -43,7 +47,40 @@ public class AiService {
         return callAi(instruction, "engagement", employeeData);
     }
 
+    // ─── RAG: HR Policy Q&A ───────────────────────────────────────────────────
+    public String askHrPolicy(String question) {
+        if ("mock-key".equals(apiKey)) {
+            log.warn("AI running in fallback mode — no HF_API_KEY set.");
+            return "I couldn't find that in the policy documents, please contact HR.";
+        }
+        try {
+            java.util.List<org.springframework.ai.document.Document> topMatches = vectorStore.similaritySearch(
+                    org.springframework.ai.vectorstore.SearchRequest.query(question).withTopK(3));
+            
+            if (topMatches.isEmpty()) {
+                return "I couldn't find any relevant information in the uploaded HR policies.";
+            }
+            
+            String context = topMatches.stream()
+                    .map(org.springframework.ai.document.Document::getContent)
+                    .collect(java.util.stream.Collectors.joining("\n\n"));
+            
+            String promptString = "You are a helpful HR assistant. Answer the employee's question based ONLY on the following policy documents.\n\n"
+                    + "Policies:\n" + context + "\n\n"
+                    + "Question: " + question;
+            
+            return chatModel.call(new Prompt(promptString)).getResult().getOutput().getText();
+        } catch (Exception e) {
+            log.warn("RAG query failed ({}).", e.getMessage());
+            return "I couldn't find that in the policy documents, please contact HR.";
+        }
+    }
+
     private String callAi(String instruction, String type, String employeeData) {
+        if ("mock-key".equals(apiKey)) {
+            log.warn("AI running in fallback mode — no HF_API_KEY set.");
+            return generateSimulatedResponse(type, employeeData);
+        }
         try {
             return chatModel.call(new Prompt(instruction))
                     .getResult()

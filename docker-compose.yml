@@ -1,7 +1,7 @@
 services:
   # 1. PostgreSQL Database
   db:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg16
     container_name: nexushr-db
     environment:
       POSTGRES_DB: nexushr

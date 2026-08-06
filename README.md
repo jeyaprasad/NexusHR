@@ -1,4 +1,4 @@
-﻿# NexusHR
+# NexusHR
 
 > **Enterprise HR, Intelligence-First**
 >
@@ -63,8 +63,9 @@ docker compose up --build
 | **F-02** | Attendance & Leave Management | ✅ Complete | Real-time time tracking, geo-fencing, automated policy enforcement |
 | **F-03** | Payroll Engine | ✅ Complete | Statutory compliance, tax computations, downloadable PDF payslips |
 | **F-04** | Performance Reviews | ✅ Complete | 360° reviews, OKR tracking, continuous feedback loops |
-| **F-05** | AI Attrition Insights | ✅ Complete | Predictive modeling via HuggingFace API (Spring AI) |
-| **F-06** | Dashboard & Workforce Intel | ✅ Complete | Real-time stats with role-based analytics and drill-down reports |
+| **F-05** | AI Attrition Insights | ✅ Complete | Predictive modeling via HuggingFace API (Spring AI) - *Prompt-based LLM generation* |
+| **F-06** | AI HR Policy RAG | ✅ Complete | Grounded Q&A on company policies using vector embeddings (pgvector) and Spring AI - *Retrieval-Augmented Generation* |
+| **F-07** | Dashboard & Workforce Intel | ✅ Complete | Real-time stats with role-based analytics and drill-down reports |
 | **F-07** | Notifications | ✅ Complete | Event-driven pub/sub via WebSocket for critical HR alerts |
 | **F-08** | Auth & RBAC | ✅ Complete | JWT (HS512) + refresh rotation, row-level security, field permissions |
 | **F-09** | Dark/Light Theme | ✅ Complete | Client-side toggle persisted per session |
@@ -249,7 +250,9 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
 - **Payroll**: Net salary = Basic + Allowances − Deductions (auto-calculated on creation)
 - **Leave Balance**: 30 days default per employee; deducted on approval, restored on rejection/cancellation
 - **PDF Payslips**: Generated server-side with OpenPDF, streamed directly to the browser
-- **AI Attrition**: HuggingFace inference via Spring AI — flags flight-risk employees before vacancies occur
+- **Generative AI Features**:
+  - **Prompt-Based (Attrition/Skills)**: HuggingFace inference via Spring AI — flags flight-risk employees before vacancies occur and identifies skill gaps. Uses explicit fallback simulation when `HF_API_KEY` is not provided.
+  - **RAG-Based (HR Policy Q&A)**: Uses `pgvector` for vector storage and `spring-ai-transformers` (Local ONNX Models) to embed uploaded HR policies (PDF/Text) locally. Provides highly accurate, grounded answers to employee queries. Automatically downloads the ONNX model (approx. 200MB) on first run.
 - **RBAC Hierarchy**:
   - `ADMIN` — full platform access
   - `HR` — employee, payroll, leave & attendance management

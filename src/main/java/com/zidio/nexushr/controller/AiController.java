@@ -16,6 +16,25 @@ public class AiController {
 
     private final AiService aiService;
     private final HuggingFaceService huggingFaceService;
+    private final com.zidio.nexushr.service.HrPolicyDocumentService hrPolicyDocumentService;
+
+    @PostMapping("/ask-hr")
+    public ResponseEntity<?> askHrPolicy(@RequestBody Map<String, String> request) {
+        String question = request.getOrDefault("question", "");
+        String answer = aiService.askHrPolicy(question);
+        return ResponseEntity.ok(Map.of("answer", answer));
+    }
+
+    @PostMapping("/policy-upload")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> uploadHrPolicy(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            hrPolicyDocumentService.ingestDocument(file);
+            return ResponseEntity.ok(Map.of("message", "Policy document ingested successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @PostMapping("/attrition")
     @PreAuthorize("hasRole('ADMIN')")

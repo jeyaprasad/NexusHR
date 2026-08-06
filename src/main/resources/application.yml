@@ -76,6 +76,11 @@ spring:
       chat:
         api-key: ${HF_API_KEY:mock-key}
         url: ${HF_ENDPOINT_URL:https://api-inference.huggingface.co/models/meta-llama/Llama-3-8b-chat-hf}
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 384
   threads:
     virtual:
       enabled: true
