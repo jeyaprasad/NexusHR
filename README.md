@@ -45,7 +45,7 @@ docker compose up --build
 | Grafana | http://localhost:3001 | Metrics Dashboard |
 | Prometheus | http://localhost:9090 | Metrics Scraper |
 
-> **Default Access** — Register at `/login` with role `ADMIN`, or POST to `/api/auth/register`.
+> **Default Access** — The database automatically seeds a default admin user on startup. Log in with **Email:** `admin@nexushr.com` and **Password:** `admin123`.
 
 To reset all data:
 ```bash
