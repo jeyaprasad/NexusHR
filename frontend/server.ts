@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import { serve } from "bun";
 import { resolve } from "path";
 
@@ -22,7 +22,7 @@ serve({
         if (process.env.API_HOST && process.env.API_PORT) {
           backendUrl = `http://${process.env.API_HOST}:${process.env.API_PORT}`;
         } else {
-          backendUrl = "http://nexushr-backend:8080";
+          backendUrl = "http://insiihr-backend:8080";
         }
       }
       if (backendUrl.endsWith("/")) {

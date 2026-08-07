@@ -1,20 +1,20 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nexushr-frontend
+  name: insiihr-frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: nexushr-frontend
+      app: insiihr-frontend
   template:
     metadata:
       labels:
-        app: nexushr-frontend
+        app: insiihr-frontend
     spec:
       containers:
         - name: frontend
-          image: nexushr-frontend:latest
+          image: insiihr-frontend:latest
           ports:
             - containerPort: 80
           resources:
@@ -35,4 +35,4 @@ spec:
     - port: 80
       targetPort: 80
   selector:
-    app: nexushr-frontend
+    app: insiihr-frontend

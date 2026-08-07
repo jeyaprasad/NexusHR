@@ -28,7 +28,7 @@ export function Sidebar() {
     <aside className="w-56 min-h-screen border-r border-border flex flex-col bg-background sticky top-0">
       <div className="px-6 py-5 border-b border-border">
         <Link to="/dashboard" className="font-display text-lg font-extrabold tracking-tighter">
-          NEXUS<span className="text-primary">HR</span>
+          INSII<span className="text-primary">HR</span>
         </Link>
       </div>
       <nav className="flex-1 py-4 px-3 space-y-1">

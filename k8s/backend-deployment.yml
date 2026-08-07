@@ -1,27 +1,27 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nexushr-backend
+  name: insiihr-backend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: nexushr-backend
+      app: insiihr-backend
   template:
     metadata:
       labels:
-        app: nexushr-backend
+        app: insiihr-backend
     spec:
       containers:
         - name: backend
-          image: nexushr-backend:latest
+          image: insiihr-backend:latest
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://db:5432/nexushr
+              value: jdbc:postgresql://db:5432/insiihr
             - name: SPRING_DATA_REDIS_HOST
               value: redis
           resources:
@@ -41,4 +41,4 @@ spec:
     - port: 8080
       targetPort: 8080
   selector:
-    app: nexushr-backend
+    app: insiihr-backend

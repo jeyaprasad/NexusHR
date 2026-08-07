@@ -1,7 +1,7 @@
-spring:
+﻿spring:
   datasource:
     # In Docker Compose and K8s the DB service is named 'db'. Override DB_HOST for other environments.
-    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:nexushr}
+    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:insiihr}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

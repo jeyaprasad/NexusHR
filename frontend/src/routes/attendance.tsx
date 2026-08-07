@@ -1,12 +1,12 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
 
 export const Route = createFileRoute("/attendance")({
-  head: () => ({ meta: [{ title: "Attendance — NexusHR" }] }),
+  head: () => ({ meta: [{ title: "Attendance — InsiiHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },

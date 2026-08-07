@@ -1,17 +1,17 @@
-/**
- * Shared auth utilities for NexusHR frontend.
+﻿/**
+ * Shared auth utilities for InsiiHR frontend.
  * Centralises token management, API calls with auth headers,
  * and redirect-to-login guard used by protected routes.
  */
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("nexushr_token");
+  return localStorage.getItem("insiihr_token");
 }
 
 export function getUser(): { email: string; fullName: string; role: string } | null {
   if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem("nexushr_user");
+  const raw = localStorage.getItem("insiihr_user");
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -30,9 +30,9 @@ export function logout() {
       headers: { Authorization: `Bearer ${token}` },
     }).catch(() => {});
   }
-  localStorage.removeItem("nexushr_token");
-  localStorage.removeItem("nexushr_refresh");
-  localStorage.removeItem("nexushr_user");
+  localStorage.removeItem("insiihr_token");
+  localStorage.removeItem("insiihr_refresh");
+  localStorage.removeItem("insiihr_user");
   window.location.href = "/login";
 }
 

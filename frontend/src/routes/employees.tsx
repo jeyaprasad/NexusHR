@@ -1,12 +1,12 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
 
 export const Route = createFileRoute("/employees")({
-  head: () => ({ meta: [{ title: "Employees — NexusHR" }] }),
+  head: () => ({ meta: [{ title: "Employees — InsiiHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -130,7 +130,7 @@ function EmployeesPage() {
           const formData = new FormData();
           if (expLetterFile) formData.append("experienceLetter", expLetterFile);
           if (gradCertFile) formData.append("graduationCertificate", gradCertFile);
-          const token = localStorage.getItem("nexushr_token");
+          const token = localStorage.getItem("insiihr_token");
           const uploadRes = await fetch(`/api/employees/${created.id}/documents`, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
@@ -243,7 +243,7 @@ function EmployeesPage() {
       setUploadingFor(empId);
       try {
         const fd = new FormData(form);
-        const token = localStorage.getItem("nexushr_token");
+        const token = localStorage.getItem("insiihr_token");
         const res = await fetch(form.action, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -296,7 +296,7 @@ function EmployeesPage() {
     try {
       const formData = new FormData();
       formData.append("file", csvFile);
-      const token = localStorage.getItem("nexushr_token");
+      const token = localStorage.getItem("insiihr_token");
       const res = await fetch("/api/employees/import", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },

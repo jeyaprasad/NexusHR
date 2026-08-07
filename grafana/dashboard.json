@@ -1,4 +1,4 @@
-{
+﻿{
   "annotations": {
     "list": [
       {
@@ -181,13 +181,13 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["monitoring", "nexushr", "prometheus"],
+  "tags": ["monitoring", "insiihr", "prometheus"],
   "time": {
     "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "NexusHR System Telemetry & Performance Metrics",
+  "title": "InsiiHR System Telemetry & Performance Metrics",
   "version": 1
 }

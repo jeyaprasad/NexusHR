@@ -23,7 +23,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
   application:
-    name: nexushr
+    name: insiihr
   profiles:
     active: dev
   jpa:
@@ -54,7 +54,7 @@ spring:
       connection-timeout: 5000
       idle-timeout: 300000
       max-lifetime: 600000
-      pool-name: NexushrPool
+      pool-name: InsiihrPool
   mail:
     host: ${SPRING_MAIL_HOST:localhost}
     port: ${SPRING_MAIL_PORT:1025}
@@ -107,14 +107,15 @@ springdoc:
 
 logging:
   level:
-    com.zidio.nexushr: INFO
+    com.zidio.insiihr: INFO
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
+    io.sentry: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%X{traceId:-}] - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%X{traceId:-}] - %msg%n"
   file:
-    name: logs/nexushr.log
+    name: logs/insiihr.log
     max-size: 100MB
     max-history: 30
 
@@ -146,7 +147,7 @@ management:
 
 info:
   app:
-    name: NexusHR
+    name: InsiiHR
     version: 1.0.0
     description: AI-Enabled Enterprise HR Platform
 

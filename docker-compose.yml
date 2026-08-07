@@ -1,10 +1,10 @@
-services:
+﻿services:
   # 1. PostgreSQL Database
   db:
     image: pgvector/pgvector:pg16
-    container_name: nexushr-db
+    container_name: insiihr-db
     environment:
-      POSTGRES_DB: nexushr
+      POSTGRES_DB: insiihr
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -15,7 +15,7 @@ services:
   # 2. Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: nexushr-redis
+    container_name: insiihr-redis
     ports:
       - "6379:6379"
 
@@ -24,14 +24,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nexushr-backend
+    container_name: insiihr-backend
     ports:
       - "8080:8080"
     volumes:
       - onnx-cache:/tmp/spring-ai-onnx-generative
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/nexushr
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/insiihr
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_DATA_REDIS_HOST=redis
@@ -49,45 +49,18 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: nexushr-frontend
+    container_name: insiihr-frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    depends_on:
-      - backend
-
-  # 5. Prometheus Metrics Scraper
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: nexushr-prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    ports:
-      - "9090:9090"
-    depends_on:
-      - backend
-
-  # 6. Grafana Visualization
-  grafana:
-    image: grafana/grafana:latest
-    container_name: nexushr-grafana
-    ports:
-      - "3001:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - VITE_SHOW_DEMO_CREDENTIALS=${VITE_SHOW_DEMO_CREDENTIALS:-true}
     depends_on:
-      - prometheus
+      - backend
+
 
 volumes:
   pgdata:
-  prometheus_data:
-  grafana_data:
   onnx-cache:

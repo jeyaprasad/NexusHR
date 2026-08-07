@@ -1,15 +1,16 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
+import { Info, Copy, Check } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign In — NexusHR" },
-      { name: "description", content: "Sign in to NexusHR Enterprise HR Platform" },
+      { title: "Sign In — InsiiHR" },
+      { name: "description", content: "Sign in to InsiiHR Enterprise HR Platform" },
     ],
   }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && localStorage.getItem("nexushr_token")) {
+    if (typeof window !== "undefined" && localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/dashboard" });
     }
   },
@@ -25,7 +26,16 @@ function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
   const navigate = Route.useNavigate();
+
+  const showDemoCreds = import.meta.env.VITE_SHOW_DEMO_CREDENTIALS !== "false";
+
+  const handleCopyDemoCreds = () => {
+    navigator.clipboard.writeText("Email: admin@insiihr.com\nPassword: admin123");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,10 +57,10 @@ function LoginPage() {
         );
       }
       const data = await res.json();
-      localStorage.setItem("nexushr_token", data.token);
-      localStorage.setItem("nexushr_refresh", data.refreshToken);
+      localStorage.setItem("insiihr_token", data.token);
+      localStorage.setItem("insiihr_refresh", data.refreshToken);
       localStorage.setItem(
-        "nexushr_user",
+        "insiihr_user",
         JSON.stringify({ email: data.email, fullName: data.fullName, role: data.role }),
       );
       navigate({ to: "/dashboard" });
@@ -69,12 +79,39 @@ function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <a href="/" className="font-display text-2xl font-extrabold tracking-tighter">
-            NEXUS<span className="text-primary">HR</span>
+            INSII<span className="text-primary">HR</span>
           </a>
           <p className="mt-2 text-sm text-muted-foreground">
             {isRegistering ? "Create your account" : "Sign in to your workspace"}
           </p>
         </div>
+
+        {showDemoCreds && !isRegistering && (
+          <div className="mb-6 p-4 rounded-md bg-secondary/60 border border-border flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2">
+            <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center justify-between">
+                Demo Credentials
+                <button
+                  type="button"
+                  onClick={handleCopyDemoCreds}
+                  className="text-[11px] flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-transparent border-none px-2 py-1 rounded hover:bg-secondary/80"
+                  title="Copy to clipboard"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </h3>
+              <div className="mt-2 space-y-1 text-sm font-mono text-muted-foreground">
+                <p>Email: <span className="text-foreground">admin@insiihr.com</span></p>
+                <p>Pass:  <span className="text-foreground">admin123</span></p>
+              </div>
+              <p className="mt-3 text-[11px] text-muted-foreground italic border-t border-border/50 pt-2">
+                * For evaluation/demo purposes only
+              </p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
           {error && (
@@ -206,7 +243,7 @@ function LoginPage() {
         </div>
 
         <p className="mt-8 text-center font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          © 2026 NexusHR Enterprise
+          © 2026 InsiiHR Enterprise
         </p>
       </div>
     </div>

@@ -1,38 +1,32 @@
-# NexusHR
+﻿# InsiiHR
 
 > **Enterprise HR, Intelligence-First**
 >
 > _The unified architecture for the modern employee lifecycle._
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-nexushr--frontend--wcmc.onrender.com-blue?style=for-the-badge&logo=render)](https://nexushr-frontend-wcmc.onrender.com)
+
 [![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-green?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-**NexusHR** is a production-grade, AI-enabled, full-stack HR management platform built on Java 21 and React 19. It manages the complete employee lifecycle — from onboarding to offboarding — with real-time analytics, predictive attrition modeling, automated payroll, and granular RBAC security.
+**InsiiHR** is a production-grade, AI-enabled, full-stack HR management platform built on Java 21 and React 19. It manages the complete employee lifecycle — from onboarding to offboarding — with real-time analytics, predictive attrition modeling, automated payroll, and granular RBAC security.
 
 ---
 
-## 🔗 Live Deployment
 
-| Service | URL |
-| :------ | :-- |
-| **Frontend** | [nexushr-frontend-wcmc.onrender.com](https://nexushr-frontend-wcmc.onrender.com) |
-| **Backend API** | [nexushr-backend-\*.onrender.com/api](https://nexushr-backend-wcmc.onrender.com/api) |
-| **API Docs (Swagger)** | `/swagger-ui/index.html` |
-
----
 
 ## 🚀 Quick Start (Docker Desktop)
+
+For the fastest day-to-day development and demo path, see [RUNNING_LOCALLY.md](RUNNING_LOCALLY.md).
 
 The entire application — backend, frontend, PostgreSQL, and Redis — runs with a **single command**:
 
 ```bash
 git clone <repo-url>
 cd Zidio
-docker compose up --build
+docker compose up -d --build
 ```
 
 | Service | URL | Description |
@@ -40,12 +34,12 @@ docker compose up --build
 | Frontend | http://localhost:3000 | TanStack Start SSR Dev Server |
 | Backend API | http://localhost:8080/api | Spring Boot REST API |
 | Swagger UI | http://localhost:8080/swagger-ui/index.html | Interactive API Docs |
-| PostgreSQL | localhost:5432 | Primary Database (`nexushr` db) |
+| PostgreSQL | localhost:5432 | Primary Database (`insiihr` db) |
 | Redis | localhost:6379 | Cache & Rate Limiter |
-| Grafana | http://localhost:3001 | Metrics Dashboard |
-| Prometheus | http://localhost:9090 | Metrics Scraper |
 
-> **Default Access** — The database automatically seeds a default admin user on startup. Log in with **Email:** `admin@nexushr.com` and **Password:** `admin123`.
+*(Note: Grafana and Prometheus are included for observability but are disabled by default to save resources. To run them, use `docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d`)*
+
+> **Default Access** — The database automatically seeds a default admin user on startup. Log in with **Email:** `admin@insiihr.com` and **Password:** `admin123`.
 
 To reset all data:
 ```bash
@@ -75,8 +69,8 @@ docker compose up --build
 ## 🏗️ Architecture
 
 ```
-NexusHR/
-├── src/main/java/com/zidio/nexushr/         # Spring Boot Backend
+InsiiHR/
+├── src/main/java/com/zidio/insiihr/         # Spring Boot Backend
 │   ├── controller/
 │   │   ├── AuthController.java              # Register / Login → JWT
 │   │   ├── EmployeeController.java          # Employee CRUD
@@ -118,7 +112,7 @@ NexusHR/
 ├── prometheus/                              # Prometheus scrape config
 ├── docker-compose.yml                       # Local orchestration
 ├── Dockerfile                               # Backend multi-stage image
-├── render.yaml                              # Render.com deployment spec
+
 └── pom.xml                                  # Maven build (Spring Boot 3.3)
 ```
 
@@ -168,7 +162,7 @@ NexusHR/
 | **Containerization** | Docker (multi-stage hardened images) |
 | **Orchestration** | Docker Compose (local) / Kubernetes (prod) |
 | **Helm** | Helm chart for K8s deployments |
-| **Cloud Hosting** | Render.com (Blueprint via `render.yaml`) |
+
 | **CI/CD** | GitHub Actions with security scans |
 | **Monitoring** | Prometheus + Grafana |
 
@@ -276,33 +270,17 @@ services:
   redis:    Redis 7        (port 6379)  — cache & rate limiter
   backend:  Spring Boot    (port 8080)  — REST API
   frontend: TanStack Start (port 3000)  — SSR frontend
-  grafana:  Grafana        (port 3001)  — metrics dashboard
-  prom:     Prometheus     (port 9090)  — metrics scraper
 ```
+*(Grafana and Prometheus are available via `docker-compose.observability.yml`)*
 
----
 
-## ☁️ Cloud Deployment (Render.com)
 
-The project ships with a `render.yaml` Blueprint that provisions and wires all services automatically:
-
-```
-render.yaml
-├── nexushr-db        PostgreSQL (managed)
-├── nexushr-backend   Spring Boot (Dockerized)
-└── nexushr-frontend  React SSR  (Dockerized, Nginx)
-```
-
-Environment variables (DB credentials, GROQ_API_KEY) are injected via Render's environment system — no manual wiring required.
-
----
-
-## ☸️ Kubernetes / Helm
+## ☸️ Production Deployment Reference (not required to run locally)
 
 Kubernetes manifests and a Helm chart are available under `k8s/` and `helm/` for production cluster deployments:
 
 ```bash
-helm install nexushr ./helm --namespace nexushr --create-namespace
+helm install insiihr ./helm --namespace insiihr --create-namespace
 ```
 
 ---
@@ -332,4 +310,4 @@ helm install nexushr ./helm --namespace nexushr --create-namespace
 
 ---
 
-© 2026 NexusHR Platform · Enterprise Edition v4.2.0
+© 2026 InsiiHR Platform · Enterprise Edition v4.2.0

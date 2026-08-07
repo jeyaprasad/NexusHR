@@ -82,13 +82,13 @@ const STATS = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "NexusHR — Enterprise HR, Intelligence-First" },
+      { title: "InsiiHR — Enterprise HR, Intelligence-First" },
       {
         name: "description",
         content:
           "Manage the complete employee lifecycle on a unified, AI-enabled, production-grade HR platform built on Java 21 and Spring AI.",
       },
-      { property: "og:title", content: "NexusHR — Enterprise HR, Intelligence-First" },
+      { property: "og:title", content: "InsiiHR — Enterprise HR, Intelligence-First" },
       {
         property: "og:description",
         content:
@@ -107,7 +107,7 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <a href="/" className="font-display text-xl font-extrabold tracking-tighter">
-              NEXUS<span className="text-primary">HR</span>
+              INSII<span className="text-primary">HR</span>
             </a>
             <div className="hidden md:flex gap-7 text-sm font-medium text-muted-foreground">
               <a href="#platform" className="hover:text-foreground transition-colors">
@@ -141,7 +141,7 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <header className="relative pt-24 pb-24 border-b border-border overflow-hidden">
+      <header className="relative pt-10 pb-24 border-b border-border overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/15 mb-10 animate-slide-up">
             <span className="size-1.5 bg-primary rounded-full animate-pulse-dot" />
@@ -358,10 +358,10 @@ function LandingPage() {
       <footer className="py-10 border-t border-border">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-display font-extrabold tracking-tighter">
-            NEXUS<span className="text-primary">HR</span>
+            INSII<span className="text-primary">HR</span>
           </span>
           <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-            © 2026 NexusHR Platform · Enterprise Edition v4.2.0
+            © 2026 InsiiHR Platform · Enterprise Edition v4.2.0
           </div>
         </div>
       </footer>

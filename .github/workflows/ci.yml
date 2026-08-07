@@ -1,4 +1,4 @@
-name: NexusHR CI/CD Pipeline
+﻿name: InsiiHR CI/CD Pipeline
 
 on:
   push:
