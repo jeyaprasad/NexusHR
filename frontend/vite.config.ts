@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [tanstackStart(), react(), tailwindcss(), tsConfigPaths()],
   server: {
     host: "0.0.0.0",
+    allowedHosts: true,
     proxy: {
       "/api": {
         target: process.env.BACKEND_URL || "http://127.0.0.1:8080",
