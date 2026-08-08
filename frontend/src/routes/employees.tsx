@@ -1,4 +1,4 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -341,7 +341,7 @@ function EmployeesPage() {
               placeholder="Search by name, email, dept…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+              className="px-3 py-2 text-sm bg-secondary border border-border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
             />
             {canCreate && (
               <>
@@ -355,7 +355,7 @@ function EmployeesPage() {
                   />
                   <button
                     onClick={() => document.getElementById("csv-input")?.click()}
-                    className="px-3 py-2 text-xs font-semibold border border-border rounded-sm hover:bg-secondary transition-colors cursor-pointer"
+                    className="px-3 py-2 text-xs font-semibold border border-border rounded-md hover:bg-secondary transition-colors cursor-pointer"
                   >
                     Import CSV
                   </button>
@@ -363,7 +363,7 @@ function EmployeesPage() {
                     <button
                       onClick={handleCsvImport}
                       disabled={importing}
-                      className="px-3 py-2 text-xs font-semibold bg-primary text-white rounded-sm hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
+                      className="px-3 py-2 text-xs font-semibold bg-primary text-white rounded-md hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
                     >
                       {importing ? "Importing…" : `Upload ${csvFile.name}`}
                     </button>
@@ -376,7 +376,7 @@ function EmployeesPage() {
                 )}
                 <button
                   onClick={openAddForm}
-                  className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
                 >
                   + Add Employee
                 </button>
@@ -400,7 +400,7 @@ function EmployeesPage() {
               </h2>
 
               {error && (
-                <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                <div className="mb-4 px-4 py-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive">
                   {error}
                 </div>
               )}
@@ -416,7 +416,7 @@ function EmployeesPage() {
                       required
                       value={formEmp.employeeId}
                       onChange={(e) => setFormEmp({ ...formEmp, employeeId: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="EMP005"
                     />
                   </div>
@@ -427,7 +427,7 @@ function EmployeesPage() {
                     <select
                       value={formEmp.status}
                       onChange={(e) => setFormEmp({ ...formEmp, status: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     >
                       <option value="ACTIVE">ACTIVE</option>
                       <option value="ON_LEAVE">ON_LEAVE</option>
@@ -447,7 +447,7 @@ function EmployeesPage() {
                       required
                       value={formEmp.firstName}
                       onChange={(e) => setFormEmp({ ...formEmp, firstName: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Jane"
                     />
                   </div>
@@ -460,7 +460,7 @@ function EmployeesPage() {
                       required
                       value={formEmp.lastName}
                       onChange={(e) => setFormEmp({ ...formEmp, lastName: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Smith"
                     />
                   </div>
@@ -476,7 +476,7 @@ function EmployeesPage() {
                       required
                       value={formEmp.email}
                       onChange={(e) => setFormEmp({ ...formEmp, email: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="jane.smith@company.com"
                     />
                   </div>
@@ -488,7 +488,7 @@ function EmployeesPage() {
                       type="text"
                       value={formEmp.phone}
                       onChange={(e) => setFormEmp({ ...formEmp, phone: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="1234567890"
                     />
                   </div>
@@ -503,7 +503,7 @@ function EmployeesPage() {
                       type="text"
                       value={formEmp.department}
                       onChange={(e) => setFormEmp({ ...formEmp, department: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Engineering"
                     />
                   </div>
@@ -515,7 +515,7 @@ function EmployeesPage() {
                       type="text"
                       value={formEmp.position}
                       onChange={(e) => setFormEmp({ ...formEmp, position: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="Senior Developer"
                     />
                   </div>
@@ -530,7 +530,7 @@ function EmployeesPage() {
                       type="number"
                       value={formEmp.salary}
                       onChange={(e) => setFormEmp({ ...formEmp, salary: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       placeholder="90000"
                     />
                   </div>
@@ -543,7 +543,7 @@ function EmployeesPage() {
                       required
                       value={formEmp.hireDate}
                       onChange={(e) => setFormEmp({ ...formEmp, hireDate: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     />
                   </div>
                 </div>
@@ -557,7 +557,7 @@ function EmployeesPage() {
                       type="file"
                       accept=".pdf"
                       onChange={(e) => setExpLetterFile(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
+                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -568,7 +568,7 @@ function EmployeesPage() {
                       type="file"
                       accept=".pdf"
                       onChange={(e) => setGradCertFile(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
+                      className="w-full px-3 py-2 text-xs bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground file:mr-3 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-foreground file:text-background hover:file:bg-foreground/80 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -577,13 +577,13 @@ function EmployeesPage() {
                   <button
                     type="button"
                     onClick={closeForm}
-                    className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-sm transition-colors cursor-pointer"
+                    className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-md transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2.5 text-sm font-medium bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
+                    className="px-4 py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
                   >
                     {editingId !== null ? "Update Employee" : "Save Employee"}
                   </button>
@@ -596,7 +596,7 @@ function EmployeesPage() {
         {loading ? (
           <div className="text-sm text-muted-foreground animate-pulse">Loading employees…</div>
         ) : (
-          <div className="border border-border rounded-sm overflow-hidden">
+          <div className="border border-border rounded-md overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
@@ -635,7 +635,7 @@ function EmployeesPage() {
                     <td className="px-4 py-3 text-muted-foreground">{emp.position || "—"}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[emp.status] ?? ""}`}
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-md border uppercase font-bold ${STATUS_COLORS[emp.status] ?? ""}`}
                       >
                         {emp.status}
                       </span>
@@ -649,7 +649,7 @@ function EmployeesPage() {
                             }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            📄 {emp.experienceLetterName}
+                            ?? {emp.experienceLetterName}
                           </button>
                         ) : (
                           <span className="text-[10px] text-muted-foreground font-mono">
@@ -676,7 +676,7 @@ function EmployeesPage() {
                             }
                             className="text-left text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            📄 {emp.graduationCertificateName}
+                            ?? {emp.graduationCertificateName}
                           </button>
                         ) : (
                           <span className="text-[10px] text-muted-foreground font-mono">

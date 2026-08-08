@@ -28,11 +28,13 @@ public class AttendanceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<AttendanceDTO> getAttendanceById(@PathVariable Long id) {
         return ResponseEntity.ok(attendanceService.getAttendanceById(id));
     }
 
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR') or @employeeService.getEmployeeEntity(#employeeId).email == authentication.name")
     public ResponseEntity<List<AttendanceDTO>> getByEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(attendanceService.getAttendanceByEmployee(employeeId));
     }
@@ -45,13 +47,13 @@ public class AttendanceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<AttendanceDTO> markAttendance(@RequestBody AttendanceDTO dto) {
         return ResponseEntity.ok(attendanceService.markAttendance(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<AttendanceDTO> updateAttendance(@PathVariable Long id, @RequestBody AttendanceDTO dto) {
         return ResponseEntity.ok(attendanceService.updateAttendance(id, dto));
     }

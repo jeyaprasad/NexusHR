@@ -1,4 +1,4 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -65,7 +65,7 @@ function LeavesPage() {
   });
 
   const [user, setUser] = useState<{ email: string; fullName: string; role: string } | null>(null);
-  const isApprover = user?.role === "ADMIN" || user?.role === "HR" || user?.role === "MANAGER";
+  const isApprover = user?.role === "ADMIN" || user?.role === "HR";
   const [selectedLeaves, setSelectedLeaves] = useState<Set<number>>(new Set());
   const [batchProcessing, setBatchProcessing] = useState(false);
 
@@ -252,7 +252,7 @@ function LeavesPage() {
                 setNewLeave((prev) => ({ ...prev, employeeId: String(currentEmployee.id) }));
               }
             }}
-            className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
           >
             Apply Leave
           </button>
@@ -260,7 +260,7 @@ function LeavesPage() {
 
         {/* Summary Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-card border border-border p-4 rounded-sm hover:border-primary/50 transition-colors flex flex-col justify-between">
+          <div className="bg-card border border-border p-4 rounded-md hover:border-primary/50 transition-colors flex flex-col justify-between">
             <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
               My Leave Balance
             </span>
@@ -271,7 +271,7 @@ function LeavesPage() {
               <span className="text-xs text-muted-foreground">days</span>
             </div>
           </div>
-          <div className="bg-card border border-border p-4 rounded-sm hover:border-yellow-500/50 transition-colors flex flex-col justify-between">
+          <div className="bg-card border border-border p-4 rounded-md hover:border-yellow-500/50 transition-colors flex flex-col justify-between">
             <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
               Pending Approvals
             </span>
@@ -282,7 +282,7 @@ function LeavesPage() {
               <span className="text-xs text-muted-foreground">requests</span>
             </div>
           </div>
-          <div className="bg-card border border-border p-4 rounded-sm hover:border-green-500/50 transition-colors flex flex-col justify-between">
+          <div className="bg-card border border-border p-4 rounded-md hover:border-green-500/50 transition-colors flex flex-col justify-between">
             <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
               Approved Requests
             </span>
@@ -293,7 +293,7 @@ function LeavesPage() {
               <span className="text-xs text-muted-foreground">requests</span>
             </div>
           </div>
-          <div className="bg-card border border-border p-4 rounded-sm hover:border-primary/50 transition-colors flex flex-col justify-between">
+          <div className="bg-card border border-border p-4 rounded-md hover:border-primary/50 transition-colors flex flex-col justify-between">
             <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
               Total Days Taken
             </span>
@@ -312,14 +312,14 @@ function LeavesPage() {
               placeholder="Search employee, leave type, or reason…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 max-w-md px-3 py-2 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground placeholder:text-muted-foreground"
+              className="flex-1 max-w-md px-3 py-2 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="flex w-full sm:w-auto gap-3">
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground cursor-pointer"
+              className="px-3 py-2 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground cursor-pointer"
             >
               <option value="ALL">All Types</option>
               <option value="ANNUAL">ANNUAL</option>
@@ -332,7 +332,7 @@ function LeavesPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground cursor-pointer"
+              className="px-3 py-2 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-foreground cursor-pointer"
             >
               <option value="ALL">All Statuses</option>
               <option value="PENDING">PENDING</option>
@@ -356,7 +356,7 @@ function LeavesPage() {
               <h2 className="font-display text-xl font-extrabold mb-4">Request Time Off</h2>
 
               {error && (
-                <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                <div className="mb-4 px-4 py-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive">
                   {error}
                 </div>
               )}
@@ -371,7 +371,7 @@ function LeavesPage() {
                     disabled={user?.role === "EMPLOYEE"}
                     value={newLeave.employeeId}
                     onChange={(e) => setNewLeave({ ...newLeave, employeeId: e.target.value })}
-                    className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground disabled:opacity-75 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground disabled:opacity-75 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Employee</option>
                     {employees.map((emp) => (
@@ -396,7 +396,7 @@ function LeavesPage() {
                     <select
                       value={newLeave.leaveType}
                       onChange={(e) => setNewLeave({ ...newLeave, leaveType: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     >
                       <option value="ANNUAL">ANNUAL</option>
                       <option value="SICK">SICK</option>
@@ -450,7 +450,7 @@ function LeavesPage() {
                           endDate: newLeave.halfDay ? newD : newLeave.endDate,
                         });
                       }}
-                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                      className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                     />
                   </div>
                   {!newLeave.halfDay && (
@@ -463,7 +463,7 @@ function LeavesPage() {
                         required
                         value={newLeave.endDate}
                         onChange={(e) => setNewLeave({ ...newLeave, endDate: e.target.value })}
-                        className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                        className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
                       />
                     </div>
                   )}
@@ -478,7 +478,7 @@ function LeavesPage() {
                     rows={3}
                     value={newLeave.reason}
                     onChange={(e) => setNewLeave({ ...newLeave, reason: e.target.value })}
-                    className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground resize-none"
+                    className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground resize-none"
                     placeholder="Enter reason for leave request…"
                   />
                 </div>
@@ -487,13 +487,13 @@ function LeavesPage() {
                   <button
                     type="button"
                     onClick={() => setIsApplying(false)}
-                    className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-sm transition-colors cursor-pointer"
+                    className="px-4 py-2.5 text-sm font-medium hover:bg-secondary rounded-md transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2.5 text-sm font-medium bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors cursor-pointer"
+                    className="px-4 py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
                   >
                     Submit Request
                   </button>
@@ -504,21 +504,21 @@ function LeavesPage() {
         )}
 
         {isApprover && selectedLeaves.size > 0 && (
-          <div className="mb-4 flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-sm">
+          <div className="mb-4 flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-md">
             <span className="text-xs font-mono text-muted-foreground">
               {selectedLeaves.size} selected
             </span>
             <button
               onClick={() => handleBatchAction("APPROVED")}
               disabled={batchProcessing}
-              className="px-3 py-1.5 text-xs font-semibold bg-green-600 text-white rounded-sm hover:bg-green-700 disabled:opacity-50 cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 cursor-pointer"
             >
               {batchProcessing ? "Processing…" : "Approve All"}
             </button>
             <button
               onClick={() => handleBatchAction("REJECTED")}
               disabled={batchProcessing}
-              className="px-3 py-1.5 text-xs font-semibold bg-red-600 text-white rounded-sm hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 cursor-pointer"
             >
               {batchProcessing ? "Processing…" : "Reject All"}
             </button>
@@ -528,7 +528,7 @@ function LeavesPage() {
         {loading ? (
           <div className="text-sm text-muted-foreground animate-pulse">Loading leave requests…</div>
         ) : (
-          <div className="border border-border rounded-sm overflow-hidden">
+          <div className="border border-border rounded-md overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
@@ -607,7 +607,7 @@ function LeavesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[l.status] ?? ""}`}
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-md border uppercase font-bold ${STATUS_COLORS[l.status] ?? ""}`}
                       >
                         {l.status}
                       </span>

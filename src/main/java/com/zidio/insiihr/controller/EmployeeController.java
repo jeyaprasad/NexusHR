@@ -22,16 +22,19 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(Pageable pageable) {
         return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
     }
 
     @GetMapping("/{id}")
+    @org.springframework.security.access.prepost.PostAuthorize("hasAnyRole('ADMIN', 'HR') or returnObject.body.email == authentication.name")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @GetMapping("/lookup/{employeeId}")
+    @org.springframework.security.access.prepost.PostAuthorize("hasAnyRole('ADMIN', 'HR') or returnObject.body.email == authentication.name")
     public ResponseEntity<EmployeeDTO> getEmployeeByEmployeeId(@PathVariable String employeeId) {
         return ResponseEntity.ok(employeeService.getEmployeeByEmployeeId(employeeId));
     }
@@ -56,6 +59,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/department/{department}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<List<EmployeeDTO>> getByDepartment(@PathVariable String department) {
         return ResponseEntity.ok(employeeService.getEmployeesByDepartment(department));
     }
@@ -76,6 +80,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}/documents/experience-letter")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR') or @employeeService.getEmployeeEntity(#id).email == authentication.name")
     public ResponseEntity<byte[]> downloadExperienceLetter(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeEntity(id);
         if (employee.getExperienceLetterData() == null) {
@@ -88,6 +93,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}/documents/graduation-certificate")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR') or @employeeService.getEmployeeEntity(#id).email == authentication.name")
     public ResponseEntity<byte[]> downloadGraduationCertificate(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeEntity(id);
         if (employee.getGraduationCertificateData() == null) {

@@ -54,10 +54,7 @@ const TECH = [
   "POSTGRESQL",
   "REDIS",
   "DOCKER",
-  "KUBERNETES",
   "SPRING AI",
-  "PROMETHEUS",
-  "GRAFANA",
   "JWT AUTH",
 ];
 
@@ -65,8 +62,6 @@ const INFRA = [
   "JWT Authentication with Refresh Rotation",
   "OWASP Hardened (XSS, CSRF, SQLi)",
   "GitHub Actions CI/CD with Security Scans",
-  "Prometheus + Grafana Observability",
-  "Auto-Scaling Kubernetes Cluster",
   "Redis Caching & Rate-Limiting",
   "PostgreSQL Encrypted at Rest",
   "Multi-Stage Hardened Docker Images",
@@ -103,7 +98,7 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/10 selection:text-primary">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <a href="/" className="font-display text-xl font-extrabold tracking-tighter">
@@ -125,14 +120,14 @@ function LandingPage() {
             <a
               href="/login"
               id="signin-nav-btn"
-              className="text-sm font-medium px-4 py-2 hover:bg-foreground/5 rounded-sm transition-colors"
+              className="text-sm font-medium px-4 py-2 hover:bg-foreground/5 rounded-md transition-colors"
             >
               Sign In
             </a>
             <a
               href="/login"
               id="getstarted-nav-btn"
-              className="text-sm font-medium bg-foreground text-background px-5 py-2 rounded-sm hover:bg-foreground/90 transition-colors"
+              className="text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-md shadow-sm hover:shadow-md hover:bg-primary/90 transition-all"
             >
               Get Started
             </a>
@@ -141,21 +136,21 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <header className="relative pt-10 pb-24 border-b border-border overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/15 mb-10 animate-slide-up">
-            <span className="size-1.5 bg-primary rounded-full animate-pulse-dot" />
-            <span className="font-mono text-[10px] font-medium tracking-widest text-primary uppercase">
+      <header className="relative min-h-[calc(100vh-4rem)] flex items-center py-12 overflow-hidden bg-gradient-to-b from-background to-secondary/30 border-b border-border">
+        <div className="w-full max-w-7xl mx-auto px-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-12 animate-slide-up shadow-sm">
+            <span className="size-2 bg-primary rounded-full animate-pulse-dot shadow-[0_0_8px_var(--color-primary)]" />
+            <span className="font-sans text-xs font-semibold tracking-wide text-primary uppercase">
               AI-Enabled · Java Full Stack · Production-Grade
             </span>
           </div>
 
           <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-end">
             <div className="animate-slide-up [animation-delay:100ms]">
-              <h1 className="font-display text-6xl md:text-8xl font-extrabold tracking-tight text-balance leading-[0.9] mb-8">
+              <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-balance leading-[1.05] mb-8 bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
                 Enterprise HR,
                 <br />
-                Intelligence-First
+                <span className="whitespace-nowrap">Intelligence-First.</span>
               </h1>
               <p className="max-w-[50ch] text-lg text-muted-foreground text-pretty leading-relaxed mb-12">
                 The unified architecture for the modern employee lifecycle. Built on Java 21 and
@@ -186,7 +181,7 @@ function LandingPage() {
               <a
                 href="/login"
                 id="hero-cta-btn"
-                className="inline-block text-sm font-medium bg-foreground text-background px-6 py-3 rounded-sm hover:bg-foreground/90 transition-colors"
+                className="inline-block text-base font-semibold bg-primary text-primary-foreground px-8 py-3.5 rounded-md shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
               >
                 Get Started
               </a>
@@ -194,10 +189,10 @@ function LandingPage() {
 
             {/* Floating mock cards */}
             <div className="relative animate-slide-up [animation-delay:300ms] hidden lg:block">
-              <div className="bg-card ring-1 ring-border shadow-2xl p-5 rounded-lg mb-4">
+              <div className="bg-card ring-1 ring-border shadow-2xl p-6 rounded-xl mb-6 transform -rotate-2 hover:rotate-0 transition-transform duration-500">
                 <div className="flex justify-between items-start mb-4">
                   <span
-                    className="font-mono text-[10px] px-2 py-0.5 rounded-sm uppercase font-bold"
+                    className="font-mono text-[10px] px-2 py-0.5 rounded-md uppercase font-bold"
                     style={{
                       color: "var(--color-signal-risk)",
                       background: "color-mix(in oklab, var(--color-signal-risk) 12%, transparent)",
@@ -218,7 +213,7 @@ function LandingPage() {
                   />
                 </div>
               </div>
-              <div className="bg-card ring-1 ring-border shadow-xl p-5 rounded-lg translate-x-8">
+              <div className="bg-card ring-1 ring-border shadow-2xl p-6 rounded-xl translate-x-12 transform rotate-3 hover:rotate-0 transition-transform duration-500">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="size-8 bg-primary/10 rounded-full flex items-center justify-center">
                     <span className="text-primary font-mono font-bold text-xs">$</span>
@@ -230,7 +225,7 @@ function LandingPage() {
                     </div>
                   </div>
                   <span
-                    className="ml-auto font-mono text-[10px] px-2 py-0.5 rounded-sm uppercase font-bold"
+                    className="ml-auto font-mono text-[10px] px-2 py-0.5 rounded-md uppercase font-bold"
                     style={{
                       color: "var(--color-signal-ok)",
                       background: "color-mix(in oklab, var(--color-signal-ok) 14%, transparent)",
@@ -265,20 +260,20 @@ function LandingPage() {
 
       {/* Feature grid */}
       <section id="platform" className="py-24 max-w-7xl mx-auto px-6">
-        <div className="mb-14">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-3">
+        <div className="mb-16">
+          <div className="font-sans text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Platform Modules
           </div>
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight max-w-2xl">
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight max-w-2xl text-foreground/90">
             Everything HR. Nothing redundant.
           </h2>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 border-l border-t border-border">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 border border-border rounded-2xl overflow-hidden shadow-sm bg-card">
           {FEATURES.map((f) => (
             <div
               key={f.n}
-              className={`p-8 border-r border-b border-border transition-colors group ${
-                f.featured ? "bg-primary/[0.04]" : "hover:bg-foreground/[0.02]"
+              className={`p-10 border-r border-b border-border transition-colors group ${
+                f.featured ? "bg-primary/[0.03]" : "hover:bg-secondary/50"
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -289,19 +284,18 @@ function LandingPage() {
                   </span>
                 ) : null}
               </div>
-              <h3 className="font-display text-xl font-bold mb-3">{f.title}</h3>
+              <h3 className="font-display text-xl font-bold mb-4">{f.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Stats band */}
-      <section id="metrics" className="bg-foreground text-background py-20">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12">
+      <section id="metrics" className="bg-foreground text-background py-24">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center lg:text-left">
           {STATS.map((s) => (
-            <div key={s.label} className="flex flex-col">
-              <span className="font-mono text-xs opacity-50 mb-3 tracking-widest">{s.label}</span>
+            <div key={s.label} className="flex flex-col items-center lg:items-start">
+              <span className="font-sans text-xs font-medium opacity-60 mb-3 tracking-widest uppercase">{s.label}</span>
               <span className="text-5xl font-display font-extrabold tracking-tighter">
                 {s.value}
               </span>
@@ -310,16 +304,15 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Infrastructure */}
-      <section id="infrastructure" className="py-24 max-w-7xl mx-auto px-6">
-        <div className="mb-16 max-w-2xl">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-3">
+      <section id="infrastructure" className="py-32 max-w-7xl mx-auto px-6">
+        <div className="mb-20 max-w-3xl">
+          <div className="font-sans text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Security & Infrastructure
           </div>
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-foreground/90">
             Secure by design. Compliant by default.
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Hardened from the database to the edge with zero-trust architecture and full
             observability.
           </p>
@@ -334,21 +327,17 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary py-24 text-primary-foreground text-center px-6">
+      <section className="bg-primary py-32 text-primary-foreground text-center px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="font-mono text-[10px] tracking-[0.25em] uppercase opacity-70 mb-5">
-            Get Started
-          </div>
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold mb-10 tracking-tight leading-tight">
+          <h2 className="font-display text-5xl md:text-6xl font-extrabold mb-10 tracking-tight leading-tight">
             Deploy intelligence to your workforce.
           </h2>
           <div className="flex justify-center items-center">
-            <button className="px-8 py-4 bg-background text-foreground text-sm font-bold rounded-sm hover:bg-background/90 transition-all">
+            <button className="px-10 py-5 bg-background text-primary text-base font-bold rounded-md shadow-xl hover:bg-background/90 hover:-translate-y-1 transition-all">
               Get Started Now
             </button>
           </div>
-          <p className="mt-10 font-mono text-[10px] opacity-70 uppercase tracking-[0.25em]">
+          <p className="mt-12 font-sans text-xs font-medium opacity-80 uppercase tracking-widest">
             Spring Boot 3 + React 19 Engine
           </p>
         </div>

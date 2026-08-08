@@ -20,30 +20,31 @@ public class PerformanceController {
     private final PerformanceService performanceService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<Page<PerformanceDTO>> getAllReviews(Pageable pageable) {
         return ResponseEntity.ok(performanceService.getAllReviews(pageable));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<PerformanceDTO> getReviewById(@PathVariable Long id) {
         return ResponseEntity.ok(performanceService.getReviewById(id));
     }
 
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR') or @employeeService.getEmployeeEntity(#employeeId).email == authentication.name")
     public ResponseEntity<List<PerformanceDTO>> getByEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(performanceService.getReviewsByEmployee(employeeId));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<PerformanceDTO> createReview(@jakarta.validation.Valid @RequestBody PerformanceDTO dto) {
         return ResponseEntity.ok(performanceService.createReview(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<PerformanceDTO> updateReview(@PathVariable Long id, @jakarta.validation.Valid @RequestBody PerformanceDTO dto) {
         return ResponseEntity.ok(performanceService.updateReview(id, dto));
     }

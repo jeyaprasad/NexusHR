@@ -34,7 +34,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             User adminUser = User.builder()
                     .email("admin@insiihr.com")
                     .password(passwordEncoder.encode("admin123"))
-                    .fullName("Admin User")
+                    .fullName("Karthik Subramanian")
                     .role(Role.ADMIN)
                     .enabled(true)
                     .build();
@@ -42,34 +42,26 @@ public class DatabaseSeeder implements CommandLineRunner {
             User hrUser = User.builder()
                     .email("hr@insiihr.com")
                     .password(passwordEncoder.encode("hr123"))
-                    .fullName("HR Manager")
+                    .fullName("Priya Natarajan")
                     .role(Role.HR)
-                    .enabled(true)
-                    .build();
-
-            User managerUser = User.builder()
-                    .email("manager@insiihr.com")
-                    .password(passwordEncoder.encode("manager123"))
-                    .fullName("Line Manager")
-                    .role(Role.MANAGER)
                     .enabled(true)
                     .build();
 
             User employeeUser = User.builder()
                     .email("employee@insiihr.com")
                     .password(passwordEncoder.encode("employee123"))
-                    .fullName("Jane Doe")
+                    .fullName("Anitha Murugesan")
                     .role(Role.EMPLOYEE)
                     .enabled(true)
                     .build();
 
-            userRepository.saveAll(List.of(adminUser, hrUser, managerUser, employeeUser));
+            userRepository.saveAll(List.of(adminUser, hrUser, employeeUser));
 
             // 2. Create Employees
             Employee empAdmin = Employee.builder()
                     .employeeId("EMP001")
-                    .firstName("Admin")
-                    .lastName("User")
+                    .firstName("Karthik")
+                    .lastName("Subramanian")
                     .email("admin@insiihr.com")
                     .phone("1234567890")
                     .department("Administration")
@@ -83,8 +75,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             Employee empHr = Employee.builder()
                     .employeeId("EMP002")
-                    .firstName("HR")
-                    .lastName("Manager")
+                    .firstName("Priya")
+                    .lastName("Natarajan")
                     .email("hr@insiihr.com")
                     .phone("1234567891")
                     .department("Human Resources")
@@ -96,25 +88,10 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .user(hrUser)
                     .build();
 
-            Employee empManager = Employee.builder()
-                    .employeeId("EMP003")
-                    .firstName("Line")
-                    .lastName("Manager")
-                    .email("manager@insiihr.com")
-                    .phone("1234567892")
-                    .department("Engineering")
-                    .position("Engineering Manager")
-                    .hireDate(LocalDate.now().minusYears(2))
-                    .salary(BigDecimal.valueOf(110000))
-                    .leaveBalance(30.0)
-                    .status(Employee.EmploymentStatus.ACTIVE)
-                    .user(managerUser)
-                    .build();
-
             Employee empJane = Employee.builder()
                     .employeeId("EMP004")
-                    .firstName("Jane")
-                    .lastName("Doe")
+                    .firstName("Anitha")
+                    .lastName("Murugesan")
                     .email("employee@insiihr.com")
                     .phone("1234567893")
                     .department("Engineering")
@@ -126,7 +103,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .user(employeeUser)
                     .build();
 
-            employeeRepository.saveAll(List.of(empAdmin, empHr, empManager, empJane));
+            employeeRepository.saveAll(List.of(empAdmin, empHr, empJane));
 
             // 3. Create Attendance Records
             Attendance att1 = Attendance.builder()
@@ -138,7 +115,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .build();
 
             Attendance att2 = Attendance.builder()
-                    .employee(empManager)
+                    .employee(empHr)
                     .date(LocalDate.now())
                     .checkIn(LocalTime.of(8, 45))
                     .status(Attendance.AttendanceStatus.PRESENT)
@@ -158,7 +135,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .build();
 
             Leave leave2 = Leave.builder()
-                    .employee(empManager)
+                    .employee(empHr)
                     .startDate(LocalDate.now().minusMonths(1))
                     .endDate(LocalDate.now().minusMonths(1).plusDays(4))
                     .leaveType("SICK")
@@ -171,10 +148,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             // 5. Create Performance Reviews
             PerformanceReview review = PerformanceReview.builder()
                     .employee(empJane)
-                    .reviewer(empManager)
+                    .reviewer(empHr)
                     .reviewDate(LocalDate.now().minusDays(5))
                     .rating(4)
-                    .feedback("Jane is doing an outstanding job leading the engineering team. Her technical skills are top-tier.")
+                    .feedback("Anitha is doing an outstanding job leading the engineering team. Her technical skills are top-tier.")
                     .goals("Expand cloud architecture knowledge and mentor junior engineers.")
                     .status(PerformanceReview.ReviewStatus.COMPLETED)
                     .sentiment("POSITIVE")

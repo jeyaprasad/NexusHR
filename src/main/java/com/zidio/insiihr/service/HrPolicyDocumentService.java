@@ -55,7 +55,7 @@ public class HrPolicyDocumentService {
             documents = List.of(new Document(content));
         }
         
-        TokenTextSplitter splitter = new TokenTextSplitter();
+        TokenTextSplitter splitter = new TokenTextSplitter(300, 50, 5, 10000, true);
         List<Document> splitDocuments = splitter.split(documents);
         
         log.info("Split document into {} chunks. Adding to VectorStore.", splitDocuments.size());

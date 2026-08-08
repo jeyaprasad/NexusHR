@@ -1,4 +1,4 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -93,7 +93,7 @@ function AttendancePage() {
             <button
               onClick={handleAutoProcess}
               disabled={autoProcessing}
-              className="px-4 py-2 text-sm font-semibold border border-border rounded-sm hover:bg-secondary transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold border border-border rounded-md hover:bg-secondary transition-colors disabled:opacity-50 cursor-pointer"
             >
               {autoProcessing ? "Processing…" : "Auto-Process Today"}
             </button>
@@ -105,7 +105,7 @@ function AttendancePage() {
             Loading attendance records…
           </div>
         ) : (
-          <div className="border border-border rounded-sm overflow-hidden">
+          <div className="border border-border rounded-md overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
@@ -138,7 +138,7 @@ function AttendancePage() {
                     <td className="px-4 py-3 font-mono text-xs">{r.lateMinutes != null && r.lateMinutes > 0 ? r.lateMinutes + "m" : "—"}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-md border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
                       >
                         {r.status}
                       </span>

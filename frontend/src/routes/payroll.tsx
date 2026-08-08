@@ -1,4 +1,4 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -116,13 +116,13 @@ function PayrollPage() {
               type="text"
               value={batchPayPeriod}
               onChange={(e) => setBatchPayPeriod(e.target.value)}
-              className="px-3 py-2 text-sm bg-secondary border border-border rounded-sm w-44 focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+              className="px-3 py-2 text-sm bg-secondary border border-border rounded-md w-44 focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
               placeholder="e.g. July 2026"
             />
             <button
               onClick={handleBatchPayroll}
               disabled={batchProcessing}
-              className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-sm hover:bg-foreground/90 disabled:opacity-50 transition-colors cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-md hover:bg-foreground/90 disabled:opacity-50 transition-colors cursor-pointer"
             >
               {batchProcessing ? "Processing…" : "Run Batch Payroll"}
             </button>
@@ -134,7 +134,7 @@ function PayrollPage() {
             Loading payroll records…
           </div>
         ) : (
-          <div className="border border-border rounded-sm overflow-x-auto">
+          <div className="border border-border rounded-md overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-secondary">
                 <tr>
@@ -185,7 +185,7 @@ function PayrollPage() {
                     <td className="px-4 py-3 font-mono text-xs font-bold">{fmt(r.netSalary)}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-md border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
                       >
                         {r.status}
                       </span>
@@ -196,7 +196,7 @@ function PayrollPage() {
                         onClick={() => downloadPayslip(r.id)}
                         className="text-xs text-primary hover:underline font-medium"
                       >
-                        PDF ↓
+                        PDF ?
                       </button>
                     </td>
                   </tr>

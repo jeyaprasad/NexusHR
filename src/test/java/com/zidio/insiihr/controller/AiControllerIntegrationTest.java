@@ -63,4 +63,17 @@ class AiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.answer").value("This is a mocked RAG answer."));
     }
+
+    @Test
+    @WithMockUser
+    void testAskHrPolicySensitiveTopic() throws Exception {
+        when(aiService.askHrPolicy(anyString())).thenReturn("This is something I'd recommend discussing directly with your HR representative, as it needs personal attention. Please reach out to hr@insiihr.com or your manager.");
+
+        mockMvc.perform(post("/api/ai/ask-hr")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"question\": \"My manager has been harassing me, what should I do?\"}")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.answer").value("This is something I'd recommend discussing directly with your HR representative, as it needs personal attention. Please reach out to hr@insiihr.com or your manager."));
+    }
 }

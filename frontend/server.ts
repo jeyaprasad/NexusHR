@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import { serve } from "bun";
 import { resolve } from "path";
 
@@ -29,7 +29,7 @@ serve({
         backendUrl = backendUrl.slice(0, -1);
       }
       
-      // We MUST delete the Host header, otherwise Render routes it right back to the frontend (508 Loop Detected)
+      // We MUST delete the Host header, otherwise the platform routes it right back to the frontend (508 Loop Detected)
       const headers = new Headers(req.headers);
       headers.delete("host");
       // Delete origin and referer to bypass Spring Boot CORS checks, since this is a server-to-server proxy request

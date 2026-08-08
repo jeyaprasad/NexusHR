@@ -10,7 +10,7 @@ export default defineConfig({
     host: "0.0.0.0",
     proxy: {
       "/api": {
-        target: process.env.BACKEND_URL || "http://backend:8080",
+        target: process.env.BACKEND_URL || "http://127.0.0.1:8080",
         changeOrigin: true,
       },
     },

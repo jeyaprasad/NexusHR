@@ -1,4 +1,4 @@
-﻿# Running Locally (Cheat Sheet)
+# Running Locally (Cheat Sheet)
 
 This is the fastest path to get the application running for day-to-day development or a live demo.
 
@@ -10,9 +10,10 @@ docker compose up -d --build
 *(This deliberately excludes the heavy Grafana/Prometheus containers. To run those, see the main `README.md`)*
 
 ## 2. Default Login
-The database automatically seeds a default admin user on startup.
-- **Email:** `admin@insiihr.com`
-- **Password:** `admin123`
+The database automatically seeds three default users for each role on startup:
+- **ADMIN**: `admin@insiihr.com` / `admin123`
+- **HR**: `hr@insiihr.com` / `hr123`
+- **EMPLOYEE**: `employee@insiihr.com` / `employee123`
 
 ## 3. Important URLs
 - **Frontend App (Login here):** [http://localhost:3000](http://localhost:3000)

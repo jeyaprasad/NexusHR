@@ -26,15 +26,15 @@ function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copiedRole, setCopiedRole] = useState<string | null>(null);
   const navigate = Route.useNavigate();
 
   const showDemoCreds = import.meta.env.VITE_SHOW_DEMO_CREDENTIALS !== "false";
 
-  const handleCopyDemoCreds = () => {
-    navigator.clipboard.writeText("Email: admin@insiihr.com\nPassword: admin123");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyDemoCreds = (role: string, email: string, pass: string) => {
+    navigator.clipboard.writeText(`Email: ${email}\nPassword: ${pass}`);
+    setCopiedRole(role);
+    setTimeout(() => setCopiedRole(null), 2000);
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -74,8 +74,8 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-card border border-border shadow-xl rounded-2xl p-8 lg:p-10">
         {/* Logo */}
         <div className="text-center mb-10">
           <a href="/" className="font-display text-2xl font-extrabold tracking-tighter">
@@ -87,24 +87,33 @@ function LoginPage() {
         </div>
 
         {showDemoCreds && !isRegistering && (
-          <div className="mb-6 p-4 rounded-md bg-secondary/60 border border-border flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2">
+          <div className="mb-8 p-4 rounded-r-lg border-l-4 border-l-primary bg-primary/[0.03] shadow-sm flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
             <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-foreground flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground mb-3">
                 Demo Credentials
-                <button
-                  type="button"
-                  onClick={handleCopyDemoCreds}
-                  className="text-[11px] flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-transparent border-none px-2 py-1 rounded hover:bg-secondary/80"
-                  title="Copy to clipboard"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied ? "Copied" : "Copy"}
-                </button>
               </h3>
-              <div className="mt-2 space-y-1 text-sm font-mono text-muted-foreground">
-                <p>Email: <span className="text-foreground">admin@insiihr.com</span></p>
-                <p>Pass:  <span className="text-foreground">admin123</span></p>
+              <div className="space-y-2">
+                {[
+                  { role: "ADMIN", email: "admin@insiihr.com", pass: "admin123" },
+                  { role: "HR", email: "hr@insiihr.com", pass: "hr123" },
+                  { role: "EMPLOYEE", email: "employee@insiihr.com", pass: "employee123" },
+                ].map((cred) => (
+                  <div key={cred.role} className="flex items-center justify-between text-xs font-mono bg-background p-2 rounded border border-border/50">
+                    <div>
+                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role}</div>
+                      <div className="text-muted-foreground"><span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span></div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyDemoCreds(cred.role, cred.email, cred.pass)}
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary"
+                      title={`Copy ${cred.role} credentials`}
+                    >
+                      {copiedRole === cred.role ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                ))}
               </div>
               <p className="mt-3 text-[11px] text-muted-foreground italic border-t border-border/50 pt-2">
                 * For evaluation/demo purposes only
@@ -115,7 +124,7 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
           {error && (
-            <div className="px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+            <div className="px-4 py-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -134,8 +143,8 @@ function LoginPage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-                placeholder="John Doe"
+                className="w-full px-3 py-2.5 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-sm"
+                placeholder="Arun Kumar"
               />
             </div>
           )}
@@ -154,7 +163,7 @@ function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              className="w-full px-3 py-2.5 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-sm"
               placeholder="you@company.com"
             />
           </div>
@@ -175,7 +184,7 @@ function LoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors pr-10"
+                className="w-full px-3 py-2.5 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-sm pr-10"
                 placeholder="••••••••"
               />
               <button
@@ -204,12 +213,11 @@ function LoginPage() {
                 id="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors text-foreground"
+                className="w-full px-3 py-2.5 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-sm text-foreground"
               >
-                <option value="ADMIN">ADMIN</option>
-                <option value="HR">HR</option>
-                <option value="MANAGER">MANAGER</option>
                 <option value="EMPLOYEE">EMPLOYEE</option>
+                <option value="HR">HR</option>
+                <option value="ADMIN">ADMIN</option>
               </select>
             </div>
           )}
@@ -218,7 +226,7 @@ function LoginPage() {
             id="login-submit"
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-sm hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="w-full py-3 mt-4 bg-primary text-primary-foreground text-sm font-semibold rounded-md shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
           >
             {loading
               ? isRegistering

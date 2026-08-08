@@ -1,4 +1,4 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -44,7 +44,7 @@ function StarRating({ rating }: { rating: number }) {
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
         <span key={s} className={s <= rating ? "text-primary" : "text-border"}>
-          ★
+          ?
         </span>
       ))}
     </div>
@@ -88,14 +88,14 @@ function PerformancePage() {
         ) : (
           <div className="space-y-4">
             {reviews.length === 0 && (
-              <div className="border border-border rounded-sm p-8 text-center text-muted-foreground">
+              <div className="border border-border rounded-md p-8 text-center text-muted-foreground">
                 No performance reviews found.
               </div>
             )}
             {reviews.map((r) => (
               <div
                 key={r.id}
-                className="border border-border rounded-sm p-5 bg-card hover:bg-card/80 transition-colors"
+                className="border border-border rounded-md p-5 bg-card hover:bg-card/80 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
@@ -113,7 +113,7 @@ function PerformancePage() {
                       </span>
                     )}
                     <span
-                      className={`font-mono text-[10px] px-2 py-0.5 rounded-sm border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
+                      className={`font-mono text-[10px] px-2 py-0.5 rounded-md border uppercase font-bold ${STATUS_COLORS[r.status] ?? ""}`}
                     >
                       {r.status}
                     </span>

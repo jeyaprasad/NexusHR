@@ -26,11 +26,13 @@ public class PayrollController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<PayrollDTO> getPayrollById(@PathVariable Long id) {
         return ResponseEntity.ok(payrollService.getPayrollById(id));
     }
 
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR') or @employeeService.getEmployeeEntity(#employeeId).email == authentication.name")
     public ResponseEntity<List<PayrollDTO>> getByEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(payrollService.getPayrollByEmployee(employeeId));
     }
@@ -61,7 +63,7 @@ public class PayrollController {
     }
 
     @GetMapping("/{id}/pdf")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
     public ResponseEntity<byte[]> downloadPayslipPdf(@PathVariable Long id) {
         byte[] pdfBytes = payrollService.generatePayslipPdf(id);
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();

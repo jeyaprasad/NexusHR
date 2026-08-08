@@ -1,5 +1,5 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { apiFetch } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
@@ -14,53 +14,115 @@ export const Route = createFileRoute("/ai-insights")({
   component: AiInsightsPage,
 });
 
+import { TriangleAlert, BookOpen, Lightbulb } from "lucide-react";
+
 type InsightType = "attrition" | "skill-gap" | "engagement";
+
+type FormField = {
+  key: string;
+  label: string;
+  type: "text" | "number";
+  example: string;
+  required?: boolean;
+};
 
 const INSIGHT_CONFIG: Record<
   InsightType,
-  { label: string; icon: string; endpoint: string; responseKey: string; placeholder: string }
+  { label: string; icon: React.ReactNode; endpoint: string; responseKey: string; fields: FormField[] }
 > = {
   attrition: {
     label: "Attrition Prediction",
-    icon: "⚠️",
+    icon: <TriangleAlert className="size-4" />,
     endpoint: "/api/ai/attrition",
     responseKey: "prediction",
-    placeholder: `Employee: Jane Doe\nRole: Lead Engineer\nTenure: 4.2 years\nLast Review Rating: 2.8/5\nLeave Days Used: 28/30\nRecent Absences: 6 in last month\nSalary Change Last Year: 0%`,
+    fields: [
+      { key: "employee", label: "Employee", type: "text", example: "Anitha Murugesan", required: true },
+      { key: "role", label: "Role", type: "text", example: "Lead Engineer", required: true },
+      { key: "tenure", label: "Tenure (years)", type: "number", example: "4.2" },
+      { key: "lastReviewRating", label: "Last Review Rating (/5)", type: "number", example: "2.8" },
+      { key: "leaveDaysUsed", label: "Leave Days Used", type: "text", example: "28/30" },
+      { key: "recentAbsences", label: "Recent Absences", type: "number", example: "6" },
+      { key: "salaryChangeLastYear", label: "Salary Change Last Year (%)", type: "number", example: "0" },
+    ]
   },
   "skill-gap": {
     label: "Skill Gap Analysis",
-    icon: "📚",
+    icon: <BookOpen className="size-4" />,
     endpoint: "/api/ai/skill-gap",
     responseKey: "analysis",
-    placeholder: `Employee: John Smith\nCurrent Role: Backend Developer\nTarget Role: Senior Backend Developer\nCurrent Skills: Java, Spring Boot, REST APIs\nYears Experience: 3\nLast Training: 18 months ago`,
+    fields: [
+      { key: "employee", label: "Employee", type: "text", example: "John Smith", required: true },
+      { key: "currentRole", label: "Current Role", type: "text", example: "Backend Developer", required: true },
+      { key: "targetRole", label: "Target Role", type: "text", example: "Senior Backend Developer", required: true },
+      { key: "currentSkills", label: "Current Skills", type: "text", example: "Java, Spring Boot, REST APIs" },
+      { key: "yearsExperience", label: "Years Experience", type: "number", example: "3" },
+      { key: "lastTraining", label: "Last Training", type: "text", example: "18 months ago" },
+    ]
   },
   engagement: {
     label: "Engagement Scoring",
-    icon: "💡",
+    icon: <Lightbulb className="size-4" />,
     endpoint: "/api/ai/engagement",
     responseKey: "score",
-    placeholder: `Employee: Alice Chen\nAttendance Rate: 94%\nAvg Performance Rating: 4.1/5\nLeave Utilisation: 12/30 days\nTenure: 2.5 years\nFeedback Sentiment: Positive\nTeam: Product Engineering`,
+    fields: [
+      { key: "employee", label: "Employee", type: "text", example: "Alice Chen", required: true },
+      { key: "attendanceRate", label: "Attendance Rate (%)", type: "text", example: "94%" },
+      { key: "avgPerformanceRating", label: "Avg Performance Rating", type: "text", example: "4.1/5" },
+      { key: "leaveUtilisation", label: "Leave Utilisation", type: "text", example: "12/30 days" },
+      { key: "tenure", label: "Tenure (years)", type: "text", example: "2.5 years" },
+      { key: "feedbackSentiment", label: "Feedback Sentiment", type: "text", example: "Positive" },
+      { key: "team", label: "Team", type: "text", example: "Product Engineering", required: true },
+    ]
   },
 };
 
 function AiInsightsPage() {
   const [activeTab, setActiveTab] = useState<InsightType>("attrition");
-  const [input, setInput] = useState("");
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const config = INSIGHT_CONFIG[activeTab];
 
+  // Reset form when changing tabs
+  useEffect(() => {
+    setFormData({});
+    setResult("");
+    setError("");
+  }, [activeTab]);
+
   async function runInsight() {
-    if (!input.trim()) return;
+    // Validation
+    const missingRequired = config.fields.filter(f => f.required && !formData[f.key]);
+    if (missingRequired.length > 0) {
+      setError(`Please fill in required fields: ${missingRequired.map(f => f.label.split(' (')[0]).join(", ")}`);
+      return;
+    }
+
+    // Construct the payload string mapping the form fields to plain text
+    const payloadString = config.fields
+      .map(f => {
+        const cleanLabel = f.label.replace(/\s*\(.*\)/, "");
+        // Only include if value is present
+        if (formData[f.key]) {
+          // Special cases to append context if they just enter numbers
+          let suffix = "";
+          if (f.label.includes("(%)") && !formData[f.key].includes("%")) suffix = "%";
+          if (f.label.includes("(years)") && !formData[f.key].includes("years")) suffix = " years";
+          return `${cleanLabel}: ${formData[f.key]}${suffix}`;
+        }
+        return `${cleanLabel}: `;
+      })
+      .join("\n");
+
     setLoading(true);
     setResult("");
     setError("");
     try {
       const res = await apiFetch(config.endpoint, {
         method: "POST",
-        body: JSON.stringify({ data: input }),
+        body: JSON.stringify({ data: payloadString }),
       });
       if (!res.ok) throw new Error("AI request failed");
       const data = await res.json();
@@ -74,14 +136,19 @@ function AiInsightsPage() {
   }
 
   function loadExample() {
-    setInput(config.placeholder);
+    const exampleData: Record<string, string> = {};
+    config.fields.forEach(f => {
+      exampleData[f.key] = f.example;
+    });
+    setFormData(exampleData);
     setResult("");
+    setError("");
   }
 
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <main className="flex-1 px-8 py-8 max-w-4xl">
+      <main className="flex-1 px-8 py-8 max-w-7xl">
         <div className="mb-6">
           <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
             F-05 · Spring AI
@@ -96,18 +163,13 @@ function AiInsightsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border border-border rounded-sm p-1 bg-secondary mb-6 w-fit">
+        <div className="flex gap-1 border border-border rounded-md p-1 bg-secondary mb-6 w-fit">
           {(Object.entries(INSIGHT_CONFIG) as [InsightType, typeof config][]).map(([key, c]) => (
             <button
               key={key}
               id={`ai-tab-${key}`}
-              onClick={() => {
-                setActiveTab(key);
-                setResult("");
-                setError("");
-                setInput("");
-              }}
-              className={`flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-sm transition-colors ${
+              onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 activeTab === key
                   ? "bg-background shadow-sm text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -119,78 +181,93 @@ function AiInsightsPage() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Input */}
-          <div className="space-y-3 lg:col-span-1">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="ai-input"
-                className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
-              >
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Input Form */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Employee Data
-              </label>
+              </div>
               <button
                 id="ai-load-example"
                 onClick={loadExample}
-                className="text-xs text-primary hover:underline"
+                className="text-xs text-primary font-medium hover:underline"
               >
                 Load example →
               </button>
             </div>
-            <textarea
-              id="ai-input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              rows={12}
-              className="w-full px-3 py-2.5 text-sm bg-secondary border border-border rounded-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors font-mono"
-              placeholder={config.placeholder}
-            />
-            <button
-              id="ai-run-btn"
-              onClick={runInsight}
-              disabled={loading || !input.trim()}
-              className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-sm hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? "Analysing…" : `Run ${config.label}`}
-            </button>
+            
+            <div className="space-y-4 bg-card border border-border p-5 rounded-lg shadow-sm">
+              {config.fields.map(f => (
+                <div key={f.key} className="space-y-1.5">
+                  <label htmlFor={f.key} className="block text-xs font-semibold text-foreground">
+                    {f.label} {f.required && <span className="text-destructive">*</span>}
+                  </label>
+                  <input
+                    id={f.key}
+                    type={f.type}
+                    value={formData[f.key] || ""}
+                    onChange={(e) => setFormData(prev => ({ ...prev, [f.key]: e.target.value }))}
+                    className="w-full px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                    placeholder={`e.g. ${f.example}`}
+                    step={f.type === "number" ? "any" : undefined}
+                  />
+                </div>
+              ))}
+              
+              <button
+                id="ai-run-btn"
+                onClick={runInsight}
+                disabled={loading}
+                className="w-full mt-2 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-md shadow-sm hover:shadow-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {loading ? "Analysing…" : `Run ${config.label}`}
+              </button>
+            </div>
           </div>
 
           {/* Output */}
-          <div className="space-y-3 lg:col-span-2 overflow-hidden">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="lg:col-span-2 overflow-hidden flex flex-col">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
               AI Response
             </div>
             <div
               id="ai-output"
-              className="min-h-[300px] border border-border rounded-sm p-4 bg-card text-sm text-foreground leading-relaxed overflow-auto"
+              className="flex-1 min-h-[400px] border border-border rounded-lg p-6 bg-card text-sm text-foreground leading-relaxed overflow-auto shadow-sm"
             >
               {loading && (
-                <span className="text-muted-foreground animate-pulse">Generating insight…</span>
+                <div className="flex items-center gap-2 text-muted-foreground animate-pulse">
+                  <div className="size-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Generating insight with {config.label}...
+                </div>
               )}
-              {error && <span className="text-destructive">{error}</span>}
+              {error && <span className="text-destructive font-medium bg-destructive/10 px-3 py-2 rounded-md">{error}</span>}
               {!loading && !error && result && (
-                <ReactMarkdown
-                  components={{
-                    h1: ({node, ...props}) => <h1 className="text-xl font-bold mt-4 mb-2" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-lg font-bold mt-4 mb-2" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-md font-bold mt-3 mb-2" {...props} />,
-                    p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
-                    li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                    strong: ({node, ...props}) => <strong className="font-semibold text-foreground" {...props} />,
-                    table: ({node, ...props}) => <div className="overflow-x-auto my-4"><table className="w-full text-left border-collapse border border-border" {...props} /></div>,
-                    th: ({node, ...props}) => <th className="border-b border-r border-border p-2 font-semibold bg-secondary/50" {...props} />,
-                    td: ({node, ...props}) => <td className="border-b border-r border-border p-2" {...props} />,
-                  }}
-                >
-                  {result}
-                </ReactMarkdown>
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      h1: ({node, ...props}) => <h1 className="text-xl font-bold mt-4 mb-2" {...props} />,
+                      h2: ({node, ...props}) => <h2 className="text-lg font-bold mt-4 mb-2 border-b border-border pb-1" {...props} />,
+                      h3: ({node, ...props}) => <h3 className="text-md font-bold mt-3 mb-2" {...props} />,
+                      p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                      li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-semibold text-foreground" {...props} />,
+                      table: ({node, ...props}) => <div className="overflow-x-auto my-4"><table className="w-full text-left border-collapse border border-border" {...props} /></div>,
+                      th: ({node, ...props}) => <th className="border-b border-r border-border p-2 font-semibold bg-secondary/50" {...props} />,
+                      td: ({node, ...props}) => <td className="border-b border-r border-border p-2" {...props} />,
+                    }}
+                  >
+                    {result}
+                  </ReactMarkdown>
+                </div>
               )}
               {!loading && !error && !result && (
-                <span className="text-muted-foreground">
-                  Enter employee data and click Run to generate insight.
-                </span>
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-70">
+                  <span className="mb-2">{config.icon}</span>
+                  <span>Enter employee data and click Run to generate insight.</span>
+                </div>
               )}
             </div>
           </div>
@@ -199,3 +276,4 @@ function AiInsightsPage() {
     </div>
   );
 }
+

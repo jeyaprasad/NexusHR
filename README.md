@@ -1,4 +1,4 @@
-﻿# InsiiHR
+# InsiiHR
 
 > **Enterprise HR, Intelligence-First**
 >
@@ -39,7 +39,10 @@ docker compose up -d --build
 
 *(Note: Grafana and Prometheus are included for observability but are disabled by default to save resources. To run them, use `docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d`)*
 
-> **Default Access** — The database automatically seeds a default admin user on startup. Log in with **Email:** `admin@insiihr.com` and **Password:** `admin123`.
+> **Default Access** — The database automatically seeds three default users for each role on startup:
+> - **ADMIN**: `admin@insiihr.com` / `admin123`
+> - **HR**: `hr@insiihr.com` / `hr123`
+> - **EMPLOYEE**: `employee@insiihr.com` / `employee123`
 
 To reset all data:
 ```bash
@@ -199,7 +202,7 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
 ### Leave Management
 | Method | Endpoint | Description |
 | :----- | :------- | :---------- |
-| `GET` | `/api/leaves` | All requests (ADMIN / HR / MANAGER) |
+| `GET` | `/api/leaves` | All requests (ADMIN / HR) |
 | `POST` | `/api/leaves` | Apply for leave (balance validated) |
 | `PUT` | `/api/leaves/{id}/status?status=APPROVED` | Approve / Reject |
 | `DELETE` | `/api/leaves/{id}` | Delete (ADMIN) |
@@ -216,7 +219,7 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
 ### Performance Reviews
 | Method | Endpoint | Description |
 | :----- | :------- | :---------- |
-| `GET` | `/api/performance` | All reviews (ADMIN / HR / MANAGER) |
+| `GET` | `/api/performance` | All reviews (ADMIN / HR) |
 | `POST` | `/api/performance` | Submit review |
 | `PUT` | `/api/performance/{id}` | Update review |
 | `DELETE` | `/api/performance/{id}` | Delete (ADMIN) |
@@ -253,8 +256,7 @@ Interactive docs: **`http://localhost:8080/swagger-ui/index.html`**
   - **RAG-Based (HR Policy Q&A)**: Uses `pgvector` for vector storage and `spring-ai-transformers` (Local ONNX Models) to embed uploaded HR policies (PDF/Text) locally. Provides highly accurate, grounded answers to employee queries. Automatically downloads the ONNX model (approx. 200MB) on first run.
 - **RBAC Hierarchy**:
   - `ADMIN` — full platform access
-  - `HR` — employee, payroll, leave & attendance management
-  - `MANAGER` — approve leaves & submit performance reviews
+  - `HR` — employee, payroll, attendance management, approve leaves & submit performance reviews
   - `EMPLOYEE` — view own data only
 - **Resilience**: Resilience4j circuit breaker wraps external HuggingFace calls with automatic fallback
 - **Schema Migrations**: Flyway replaces `ddl-auto: update` for deterministic, production-safe migrations

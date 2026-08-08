@@ -17,7 +17,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/stats")
-    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
         return ResponseEntity.ok(dashboardService.getDashboardStats());
     }

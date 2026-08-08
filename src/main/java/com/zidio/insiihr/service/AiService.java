@@ -24,7 +24,7 @@ public class AiService {
         String instruction = "You are an HR AI expert. Analyze the following employee metrics for attrition risk. "
                 + "Respond with: 1) Risk Level: Low/Medium/High, 2) Key Risk Factors (3 bullets), "
                 + "3) Recommended Retention Actions (3 bullets). "
-                + "Be specific and actionable. Employee Data: " + employeeData;
+                + "Be specific and actionable. Do NOT use markdown asterisks or bolding. Use plain text formatting. Employee Data: " + employeeData;
         return callAi(instruction, "attrition", employeeData);
     }
 
@@ -33,7 +33,7 @@ public class AiService {
         String instruction = "You are an HR talent development AI. Analyze the following employee profile and role requirements. "
                 + "Identify: 1) Current Skills, 2) Required Skills for role advancement (3 skills), "
                 + "3) Skill Gaps (missing or weak areas), 4) Recommended Learning Resources or Certifications. "
-                + "Employee and Role Data: " + employeeData;
+                + "Do NOT use markdown asterisks or bolding. Use plain text formatting. Employee and Role Data: " + employeeData;
         return callAi(instruction, "skill-gap", employeeData);
     }
 
@@ -43,7 +43,7 @@ public class AiService {
                 + "(attendance rate, performance review scores, leave usage, tenure, feedback sentiment), "
                 + "provide: 1) Engagement Score (0-100), 2) Engagement Level: Disengaged/Neutral/Engaged/Highly Engaged, "
                 + "3) Top 3 Engagement Drivers, 4) Top 3 Engagement Risks, 5) Recommended Actions. "
-                + "Employee Data: " + employeeData;
+                + "Do NOT use markdown asterisks or bolding. Use plain text formatting. Employee Data: " + employeeData;
         return callAi(instruction, "engagement", employeeData);
     }
 
@@ -51,11 +51,7 @@ public class AiService {
     public String askHrPolicy(String question) {
         try {
             java.util.List<org.springframework.ai.document.Document> topMatches = vectorStore.similaritySearch(
-                    org.springframework.ai.vectorstore.SearchRequest.builder().query(question).topK(3).build());
-            
-            if (topMatches.isEmpty()) {
-                return "I couldn't find any relevant information in the uploaded HR policies.";
-            }
+                    org.springframework.ai.vectorstore.SearchRequest.builder().query(question).topK(5).similarityThresholdAll().build());
             
             String context = topMatches.stream()
                     .map(org.springframework.ai.document.Document::getText)
@@ -66,7 +62,12 @@ public class AiService {
                 return "[Fallback Mock Response] Based on the policy context retrieved:\n" + context;
             }
 
-            String promptString = "You are a helpful HR assistant. Answer the employee's question based ONLY on the following policy documents.\n\n"
+            String systemInstruction = "You are a helpful HR assistant. Respond in a professional, policy-accurate tone at all times.\n"
+                    + "If the employee's question involves a sensitive topic — harassment, discrimination, disciplinary action, termination, personal medical/mental health disclosures, workplace conflict, legal disputes, or anything a reasonable HR professional would want a human to handle directly — you must NOT attempt to answer the substance of the question. Instead, you must respond exactly with: \"This is something I'd recommend discussing directly with your HR representative, as it needs personal attention. Please reach out to hr@insiihr.com or your manager.\"\n"
+                    + "Only answer directly from retrieved document context for genuine policy/factual questions (leave days, benefits eligibility, onboarding steps, payroll dates/process, etc.).\n"
+                    + "If nothing relevant is provided in the policy context for a legitimate policy question, you must respond exactly with: \"I couldn't find any relevant information in the uploaded HR policies.\"\n";
+
+            String promptString = systemInstruction + "\n"
                     + "Policies:\n" + context + "\n\n"
                     + "Question: " + question;
             

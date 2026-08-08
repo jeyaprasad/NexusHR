@@ -1,6 +1,7 @@
-﻿import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -28,12 +29,12 @@ import { Sidebar, NAV_ITEMS } from "../components/Sidebar";
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="border border-border rounded-sm p-6 bg-card">
+    <div className="border border-border rounded-lg p-6 bg-card shadow-sm hover:shadow-md transition-shadow">
       <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3">
         {label}
       </div>
-      <div className="text-4xl font-display font-extrabold tracking-tighter">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground mt-2">{sub}</div>}
+      <div className="text-4xl font-display font-bold tracking-tighter text-foreground">{value}</div>
+      {sub && <div className="text-xs text-muted-foreground mt-2 font-medium">{sub}</div>}
     </div>
   );
 }
@@ -70,37 +71,75 @@ function DashboardPage() {
         {error && <div className="text-sm text-destructive">{error}</div>}
 
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            <StatCard label="Total Employees" value={stats.totalEmployees} />
-            <StatCard label="Active" value={stats.activeEmployees} sub="Currently employed" />
-            <StatCard label="Present Today" value={stats.presentToday} sub="Clock-ins recorded" />
-            <StatCard label="Absent Today" value={stats.absentToday} sub="No check-in" />
+          <div className="space-y-6 mb-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatCard label="Total Employees" value={stats.totalEmployees} />
+              <StatCard label="Active" value={stats.activeEmployees} sub="Currently employed" />
+              <StatCard label="Present Today" value={stats.presentToday} sub="Clock-ins recorded" />
+              <StatCard label="Absent Today" value={stats.absentToday} sub="No check-in" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up">
+              <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6">Workforce Distribution</div>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Active", value: stats.activeEmployees },
+                          { name: "Inactive", value: stats.totalEmployees - stats.activeEmployees },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        <Cell fill="var(--color-primary)" />
+                        <Cell fill="var(--color-muted-foreground)" />
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        itemStyle={{ color: 'var(--color-foreground)', fontSize: '14px', fontWeight: 500 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6">Today's Attendance</div>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Present", value: stats.presentToday },
+                          { name: "Absent", value: stats.absentToday },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        <Cell fill="var(--color-signal-ok)" />
+                        <Cell fill="var(--color-signal-risk)" />
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        itemStyle={{ color: 'var(--color-foreground)', fontSize: '14px', fontWeight: 500 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Quick Links */}
-        <div className="border-t border-border pt-8">
-          <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-4">
-            Quick Access
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {NAV_ITEMS.slice(1).map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 p-4 border border-border rounded-sm hover:bg-foreground/[0.03] transition-colors group"
-              >
-                <span className="text-lg">{item.icon}</span>
-                <div>
-                  <div className="text-sm font-semibold">{item.label}</div>
-                  <div className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
-                    Manage →
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
+
       </main>
     </div>
   );
