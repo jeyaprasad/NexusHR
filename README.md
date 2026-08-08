@@ -19,7 +19,7 @@
 
 ## 🚀 Quick Start (Docker Desktop)
 
-For the fastest day-to-day development and demo path, see [RUNNING_LOCALLY.md](RUNNING_LOCALLY.md).
+For the fastest day-to-day development and demo path, see [RUNNING_LOCALLY.md](docs/RUNNING_LOCALLY.md).
 
 The entire application — backend, frontend, PostgreSQL, and Redis — runs with a **single command**:
 
@@ -73,50 +73,35 @@ docker compose up --build
 
 ```
 InsiiHR/
-├── src/main/java/com/zidio/insiihr/         # Spring Boot Backend
-│   ├── controller/
-│   │   ├── AuthController.java              # Register / Login → JWT
-│   │   ├── EmployeeController.java          # Employee CRUD
-│   │   ├── AttendanceController.java        # Attendance tracking
-│   │   ├── LeaveController.java             # Leave requests & approvals
-│   │   ├── PayrollController.java           # Payroll + PDF payslip
-│   │   ├── PerformanceController.java       # 360° reviews & OKRs
-│   │   ├── DashboardController.java         # Workforce stats
-│   │   ├── AiController.java               # AI attrition insights
-│   │   └── NotificationController.java      # WebSocket push notifications
-│   ├── service/                             # Business logic layer
-│   ├── entity/                              # JPA entities
-│   ├── dto/                                 # Request / Response DTOs
-│   ├── repository/                          # Spring Data JPA repositories
-│   ├── security/                            # JWT filter, UserDetailsService
-│   ├── config/                              # Security, CORS, Redis, WebSocket
-│   └── exception/                           # Global exception handler
+├── backend/                                 # Spring Boot Backend
+│   ├── src/main/java/com/zidio/insiihr/     
+│   │   ├── controller/                      # REST endpoints
+│   │   ├── service/                         # Business logic layer
+│   │   ├── entity/                          # JPA entities
+│   │   ├── repository/                      # Spring Data JPA repositories
+│   │   ├── security/                        # JWT filter, UserDetailsService
+│   │   └── config/                          # Security, CORS, Redis, WebSocket
+│   ├── Dockerfile                           # Backend multi-stage image
+│   └── pom.xml                              # Maven build (Spring Boot 3.3)
 │
 ├── frontend/                                # React 19 Frontend (TanStack Start)
 │   └── src/
-│       ├── routes/
-│       │   ├── index.tsx                    # Landing page (public)
-│       │   ├── login.tsx                    # Sign In / Register
-│       │   ├── dashboard.tsx                # Workforce stats overview
-│       │   ├── employees.tsx                # Employee management
-│       │   ├── attendance.tsx               # Attendance tracking
-│       │   ├── leaves.tsx                   # Leave management
-│       │   ├── payroll.tsx                  # Payroll & PDF payslips
-│       │   ├── performance.tsx              # Reviews & OKRs
-│       │   └── ai-insights.tsx             # AI attrition predictions
+│       ├── routes/                          # File-based routing (pages)
 │       ├── components/                      # Radix UI / shadcn/ui components
-│       ├── hooks/                           # Custom React hooks
 │       ├── lib/                             # Utilities (api client, auth, cn)
 │       └── styles.css                       # TailwindCSS v4 global styles
 │
-├── k8s/                                     # Kubernetes manifests
-├── helm/                                    # Helm chart
+├── docs/                                    # Documentation
+│   ├── RUNNING_LOCALLY.md
+│   └── HR_CHATBOT_DEEPDIVE.md
+│
+├── infra/                                   # Infrastructure & Orchestration
+│   ├── k8s/                                 # Kubernetes manifests
+│   └── helm/                                # Helm chart
+│
 ├── grafana/                                 # Grafana dashboard configs
 ├── prometheus/                              # Prometheus scrape config
-├── docker-compose.yml                       # Local orchestration
-├── Dockerfile                               # Backend multi-stage image
-
-└── pom.xml                                  # Maven build (Spring Boot 3.3)
+└── docker-compose.yml                       # Local orchestration
 ```
 
 ---
