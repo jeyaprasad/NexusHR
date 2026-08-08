@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { apiFetch, getUser } from "../lib/auth";
 import { Sidebar } from "../components/Sidebar";
 import { MessageSquare, Upload, Send } from "lucide-react";
@@ -165,7 +166,7 @@ function HrAssistantPage() {
               >
                 {msg.role === "ai" ? (
                   <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                   </div>
                 ) : (
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>

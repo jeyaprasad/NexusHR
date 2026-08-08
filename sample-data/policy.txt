@@ -1,7 +1,88 @@
-Employees are entitled to 20 days of paid time off per year. Sick leave is unlimited but requires a doctor's note after 3 consecutive days.
+INSII HR — EMPLOYEE HANDBOOK & COMPANY POLICIES
 
-Benefits: All full-time employees are eligible for standard health insurance (comprehensive medical, dental, and vision coverage) starting from their first day of employment. Dependents can be added during the annual open enrollment period.
+==================================================
+SECTION 1: LEAVE POLICY
+==================================================
 
-Onboarding: During your first week, you will complete the standard onboarding process. This includes IT setup (laptop provisioning, account creation), mandatory compliance training, and introductory meetings with your team lead. Please ensure you have submitted your tax forms and direct deposit information to HR by day 3.
+Annual Paid Time Off (PTO)
+Every full-time employee is entitled to 20 days of paid time off (PTO) per calendar year. PTO accrues monthly and can be used for vacation, personal time, or any reason the employee chooses. Unused PTO up to 5 days may be carried over into the next calendar year; any remaining unused days beyond that are forfeited at year-end.
 
-Payroll: Employees are paid on a bi-weekly cycle (every other Friday). Payslips are issued electronically on the Wednesday before payday and can be accessed via the payroll portal. If you notice any discrepancy in your pay, please raise a payroll discrepancy ticket in the internal portal immediately.
+Sick Leave
+Employees receive unlimited sick leave for genuine illness. If an employee is absent due to illness for 3 or more consecutive days, a doctor's note is required before returning to work. Sick leave does not need to be pre-approved but should be reported to your manager as early as possible on the day of absence.
+
+Leave Application Process
+To request leave, submit a leave request through the HR portal at least 3 working days in advance for planned leave. Sick leave can be reported on the day of absence.
+
+Public Holidays
+Employees receive all nationally and regionally recognized public holidays as paid leave, in addition to their PTO allocation.
+
+==================================================
+SECTION 2: BENEFITS
+==================================================
+
+Health Insurance
+The company provides group health insurance coverage (comprehensive medical, dental, and vision coverage) for all full-time employees, subject to the policy terms of the insurance provider. Coverage begins on the first day of employment.
+
+Dependent Coverage
+Employees may optionally add spouses and children to their health insurance plan at a subsidized additional cost during the annual open enrollment period.
+
+Wellness & Development
+- Employees have access to an Employee Assistance Program (EAP) offering confidential counseling at no cost.
+- The company reimburses up to a set annual allowance for approved professional certifications and courses.
+- Employees are automatically enrolled in the company's retirement/provident fund scheme with matched contributions.
+
+==================================================
+SECTION 3: ONBOARDING
+==================================================
+
+Before Day One & Initial Setup
+New hires receive an offer letter and onboarding checklist, including required documentation. Please ensure you have submitted your tax forms and direct deposit information to HR before Day One, or by Day 3 at the latest.
+
+First Week
+- Day 1: Orientation session covering company policies, culture, and team introductions. IT setup (laptop provisioning, account creation) is completed.
+- Days 2-3: Role-specific training, mandatory compliance training, and meetings with the team lead.
+- Days 4-5: Meetings with key cross-functional stakeholders, and setup of all necessary system access (email, HR portal, project management tools).
+
+Probation Period
+New employees undergo a probation period of 90 days, during which performance and fit are assessed at the 30, 60, and 90-day marks.
+
+Buddy Program
+Each new hire is assigned a "buddy" to help them navigate their first month and assist with cultural integration.
+
+==================================================
+SECTION 4: PAYROLL
+==================================================
+
+Pay Cycle
+Salaries are processed based on your employment classification, either on a bi-weekly cycle (every other Friday) or on the last working day of each month. Salaries are disbursed directly to your registered bank account.
+
+Payslips
+Digital payslips are generated and made available through the HR portal (either the Wednesday before a bi-weekly payday, or by the 1st working day of the following month). Payslips include a breakdown of basic salary, allowances, deductions, and net pay.
+
+Payroll Discrepancies
+If you notice any discrepancy in your pay (incorrect amount, missing reimbursement, deduction error), please raise a payroll discrepancy ticket in the internal portal within 7 days of receiving the payslip. HR will investigate and issue a correction in the next cycle.
+
+Reimbursements & Taxes
+Business-related expense reimbursements are processed through the expense claim system and paid out in the following payroll cycle after approval (submit within 30 days). Annual tax statements are made available through the HR portal by the statutory deadline each year.
+
+==================================================
+SECTION 5: FREQUENTLY ASKED QUESTIONS (FAQ)
+==================================================
+
+Q: How many leave days do I get per year?
+A: 20 days of paid time off per year, plus unlimited sick leave (doctor's note required after 3+ consecutive sick days).
+
+Q: When do I get paid?
+A: Depending on your classification, salaries are paid either bi-weekly (every other Friday) or on the last working day of each month.
+
+Q: How do I add my spouse to my health insurance?
+A: Contact HR to add dependents to your health insurance plan at a subsidized cost during the annual open enrollment period.
+
+Q: What happens during my first week?
+A: Day 1 covers orientation and IT setup. Days 2-3 cover role-specific training and compliance. Days 4-5 cover stakeholder meetings and final systems access.
+
+Q: Who do I contact about a payroll error?
+A: Raise a discrepancy ticket in the internal portal within 7 days of receiving your payslip.
+
+Q: Can I carry over unused leave to next year?
+A: Yes, up to 5 unused PTO days can be carried over.
