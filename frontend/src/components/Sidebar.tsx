@@ -28,6 +28,7 @@ export function Sidebar() {
     setUser(getUser());
   }, []);
   return (
+    <>
     <aside className="w-56 min-h-screen border-r border-border flex flex-col bg-background sticky top-0">
       <div className="px-6 py-5 border-b border-border">
         <Link to="/dashboard" className="font-display text-lg font-extrabold tracking-tighter">
@@ -73,5 +74,13 @@ export function Sidebar() {
         </button>
       </div>
     </aside>
+    <Link
+      to="/hr-assistant"
+      className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all z-50"
+      title="Open HR Assistant"
+    >
+      <MessageSquare className="w-6 h-6" />
+    </Link>
+    </>
   );
 }
