@@ -86,42 +86,6 @@ function LoginPage() {
           </p>
         </div>
 
-        {showDemoCreds && !isRegistering && (
-          <div className="mb-8 p-4 rounded-r-lg border-l-4 border-l-primary bg-primary/[0.03] shadow-sm flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
-            <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold text-foreground mb-3">
-                Demo Credentials
-              </h3>
-              <div className="space-y-2">
-                {[
-                  { role: "ADMIN", email: "admin@insiihr.com", pass: "admin123" },
-                  { role: "HR", email: "hr@insiihr.com", pass: "hr123" },
-                  { role: "EMPLOYEE", email: "employee@insiihr.com", pass: "employee123" },
-                ].map((cred) => (
-                  <div key={cred.role} className="flex items-center justify-between text-xs font-mono bg-background p-2 rounded border border-border/50">
-                    <div>
-                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role}</div>
-                      <div className="text-muted-foreground"><span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span></div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyDemoCreds(cred.role, cred.email, cred.pass)}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary"
-                      title={`Copy ${cred.role} credentials`}
-                    >
-                      {copiedRole === cred.role ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-3 text-[11px] text-muted-foreground italic border-t border-border/50 pt-2">
-                * For evaluation/demo purposes only
-              </p>
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
           {error && (
             <div className="px-4 py-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive">
@@ -237,6 +201,42 @@ function LoginPage() {
                 : "Sign In"}
           </button>
         </form>
+
+        {showDemoCreds && !isRegistering && (
+          <div className="mt-8 p-4 rounded-r-lg border-l-4 border-l-primary bg-primary/[0.03] shadow-sm flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
+            <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-foreground mb-3">
+                Demo Credentials
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { role: "ADMIN", email: "admin@insiihr.com", pass: "admin123" },
+                  { role: "HR", email: "hr@insiihr.com", pass: "hr123" },
+                  { role: "EMPLOYEE", email: "employee@insiihr.com", pass: "employee123" },
+                ].map((cred) => (
+                  <div key={cred.role} className="flex items-center justify-between text-xs font-mono bg-background p-2 rounded border border-border/50">
+                    <div>
+                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role}</div>
+                      <div className="text-muted-foreground"><span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span></div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyDemoCreds(cred.role, cred.email, cred.pass)}
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary cursor-pointer"
+                      title={`Copy ${cred.role} credentials`}
+                    >
+                      {copiedRole === cred.role ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-[11px] text-muted-foreground italic border-t border-border/50 pt-2">
+                * For evaluation/demo purposes only
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 text-center">
           <button

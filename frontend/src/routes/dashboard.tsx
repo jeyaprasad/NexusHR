@@ -2,12 +2,11 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  BarChart, Bar
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend
 } from "recharts";
-import { Users, UserCheck, Calendar, Clock, IndianRupee, TrendingUp, Activity } from "lucide-react";
-import { Sidebar } from "../components/Sidebar";
+import { Users, UserCheck, Calendar, Clock, MoreHorizontal, CheckCircle2 } from "lucide-react";
+import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -44,215 +43,253 @@ type Stats = {
   }[];
 };
 
-function StatCard({ label, value, icon: Icon, sub }: { label: string; value: string | number; icon: any; sub?: string }) {
+const CHART_COLORS = ['#2563eb', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+
+function KPICard({ label, value, icon: Icon, colorClass, bgClass }: { label: string, value: number | string, icon: any, colorClass: string, bgClass: string }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
-      <div className="absolute top-4 right-4 text-muted-foreground/30 group-hover:text-primary/20 transition-colors">
-        <Icon className="w-8 h-8" />
+    <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex flex-col justify-between h-[150px]">
+      <div className="flex items-center justify-between mb-4">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${bgClass} ${colorClass}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <button className="text-muted-foreground hover:text-foreground">
+          <MoreHorizontal className="w-5 h-5" />
+        </button>
       </div>
-      <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3 pr-8">
-        {label}
+      <div>
+        <div className="text-sm font-medium text-muted-foreground mb-1">{label}</div>
+        <div className="text-3xl font-display font-bold text-foreground">{value}</div>
       </div>
-      <div className="text-3xl font-display font-bold tracking-tighter text-foreground">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground mt-2 font-medium">{sub}</div>}
     </div>
   );
 }
 
-const COLORS = ['#6366f1', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#3b82f6'];
-
 function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     apiFetch("/api/dashboard/stats")
       .then((r) => r.json())
       .then(setStats)
-      .catch(() => setError("Failed to load dashboard metrics"))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const formattedLeaveData = (() => {
+  // Compute Leave Types for Stacked Progress Bar (just taking the most recent month for demo)
+  const currentMonthLeaves = (() => {
     if (!stats?.leaveTypeBreakdown) return [];
-    const map = new Map<string, any>();
-    stats.leaveTypeBreakdown.forEach(({ month, type, count }) => {
-      if (!map.has(month)) map.set(month, { month });
-      map.get(month)[type] = count;
-    });
-    return Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month));
+    const latestMonth = stats.leaveTypeBreakdown[stats.leaveTypeBreakdown.length - 1]?.month;
+    return stats.leaveTypeBreakdown.filter(l => l.month === latestMonth);
   })();
-
-  const leaveTypes = Array.from(new Set(stats?.leaveTypeBreakdown?.map(l => l.type) || []));
+  const totalMonthLeaves = currentMonthLeaves.reduce((acc, curr) => acc + curr.count, 0);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 px-4 md:px-8 py-8 max-w-[1200px] mx-auto w-full">
-        <div className="mb-8">
-          <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
-            Overview
-          </div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight">
-            Workforce Dashboard
-          </h1>
-        </div>
-
+    <Layout>
+      <main className="flex-1 p-6 md:p-8 w-full mx-auto">
         {loading && (
-          <div className="text-sm text-muted-foreground animate-pulse">Loading metrics…</div>
+          <div className="text-sm text-muted-foreground animate-pulse">Loading dashboard...</div>
         )}
-        {error && <div className="text-sm text-destructive">{error}</div>}
 
         {stats && (
-          <div className="space-y-6 mb-10 animate-slide-up">
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              <StatCard label="Total Employees" value={stats.totalEmployees} icon={Users} />
-              <StatCard label="Active Staff" value={stats.activeEmployees} icon={UserCheck} />
-              <StatCard label="On Leave Today" value={stats.onLeaveToday} icon={Calendar} />
-              <StatCard label="Pending Leaves" value={stats.pendingLeaveRequests} icon={Clock} />
-              <StatCard 
-                label="Average Salary" 
-                value={`₹${stats.averageSalary.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} 
-                icon={IndianRupee} 
+          <div className="space-y-6 animate-slide-up">
+            
+            {/* 1. KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <KPICard 
+                label="Total Employees" 
+                value={stats.totalEmployees} 
+                icon={Users} 
+                colorClass="text-blue-600 dark:text-blue-400" 
+                bgClass="bg-blue-100 dark:bg-blue-900/30" 
               />
-              <StatCard 
-                label="Avg Performance" 
-                value={stats.averagePerformanceRating.toFixed(1)} 
-                icon={TrendingUp} 
+              <KPICard 
+                label="Active Staff" 
+                value={stats.activeEmployees} 
+                icon={UserCheck} 
+                colorClass="text-emerald-600 dark:text-emerald-400" 
+                bgClass="bg-emerald-100 dark:bg-emerald-900/30" 
+              />
+              <KPICard 
+                label="On Leave Today" 
+                value={stats.onLeaveToday} 
+                icon={Calendar} 
+                colorClass="text-orange-600 dark:text-orange-400" 
+                bgClass="bg-orange-100 dark:bg-orange-900/30" 
+              />
+              <KPICard 
+                label="Pending Requests" 
+                value={stats.pendingLeaveRequests} 
+                icon={Clock} 
+                colorClass="text-purple-600 dark:text-purple-400" 
+                bgClass="bg-purple-100 dark:bg-purple-900/30" 
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 shadow-sm">
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6">Weekly Active Headcount (Last 14 Days)</div>
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stats.headcountHistory}>
-                      <defs>
-                        <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                      <XAxis 
-                        dataKey="date" 
-                        tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                        stroke="var(--color-muted-foreground)" 
-                        fontSize={12} 
-                        tickLine={false} 
-                        axisLine={false} 
-                        minTickGap={20}
-                      />
-                      <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        labelFormatter={(val) => new Date(val).toLocaleDateString()}
-                      />
-                      <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', marginTop: '10px' }} />
-                      <Area type="monotone" dataKey="active" name="Active Staff" stroke="var(--color-primary)" fillOpacity={1} fill="url(#colorActive)" strokeWidth={2} />
-                      <Area type="monotone" dataKey="onLeave" name="On Leave" stroke="var(--color-signal-risk)" fill="none" strokeWidth={2} strokeDasharray="4 4" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6">Department Distribution</div>
-                <div className="h-72 flex flex-col justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={stats.departmentDistribution}
-                        cx="50%"
-                        cy="45%"
-                        innerRadius={55}
-                        outerRadius={80}
-                        paddingAngle={2}
-                        dataKey="count"
-                        nameKey="department"
-                      >
-                        {stats.departmentDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      />
-                      <Legend 
-                        iconType="circle" 
-                        layout="horizontal" 
-                        verticalAlign="bottom" 
-                        align="center"
-                        wrapperStyle={{ fontSize: '12px' }}
-                        formatter={(value, entry: any) => `${value} (${entry.payload.count})`}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 shadow-sm">
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6">Monthly Leave Type Breakdown</div>
-                <div className="h-64">
-                  {formattedLeaveData.length > 0 ? (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              {/* Left Column (Bar Chart & Progress Bar) */}
+              <div className="xl:col-span-2 space-y-6">
+                
+                {/* 3. Bar Chart Panel */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-lg font-bold text-foreground">Headcount Trends</h2>
+                  </div>
+                  <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={formattedLeaveData}>
+                      <BarChart data={stats.headcountHistory} barGap={4}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                         <XAxis 
-                          dataKey="month" 
+                          dataKey="date" 
+                          tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                           stroke="var(--color-muted-foreground)" 
                           fontSize={12} 
                           tickLine={false} 
                           axisLine={false} 
                         />
-                        <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                        <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
                         <Tooltip 
-                          contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)' }}
+                          labelFormatter={(val) => new Date(val).toLocaleDateString()}
                         />
-                        <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-                        {leaveTypes.map((type, index) => (
-                          <Bar key={type} dataKey={type} stackId="a" fill={COLORS[index % COLORS.length]} radius={index === leaveTypes.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]} />
-                        ))}
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} verticalAlign="top" align="right" />
+                        <Bar dataKey="active" name="Active" fill="#2563eb" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                        <Bar dataKey="onLeave" name="On Leave" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={40} />
                       </BarChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No leave data available.</div>
-                  )}
+                  </div>
                 </div>
+
+                {/* 2. Stacked Progress Bar */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-lg font-bold text-foreground">Leave Breakdown (Current Month)</h2>
+                    <div className="text-2xl font-bold">{totalMonthLeaves}</div>
+                  </div>
+                  
+                  <div className="h-4 w-full rounded-full flex overflow-hidden mb-6 bg-secondary">
+                    {currentMonthLeaves.map((leave, idx) => (
+                      <div 
+                        key={leave.type} 
+                        style={{ width: `${(leave.count / totalMonthLeaves) * 100}%`, backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
+                        className="h-full transition-all hover:opacity-90 cursor-pointer"
+                        title={`${leave.type}: ${leave.count}`}
+                      />
+                    ))}
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-6">
+                    {currentMonthLeaves.map((leave, idx) => (
+                      <div key={leave.type} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
+                        <span className="text-sm font-medium text-foreground">{leave.type}</span>
+                        <span className="text-sm text-muted-foreground">({((leave.count / totalMonthLeaves) * 100).toFixed(0)}%)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-6 shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Recent Activity</div>
-                  <Activity className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                  {stats.recentActivity && stats.recentActivity.length > 0 ? (
-                    stats.recentActivity.map((log) => (
-                      <div key={log.id} className="relative pl-4 border-l-2 border-border">
-                        <div className="absolute w-2 h-2 bg-primary rounded-full -left-[5px] top-1.5 ring-4 ring-card"></div>
-                        <div className="text-sm font-medium text-foreground">{log.action}</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {log.entityType} • {new Date(log.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                        {log.performedBy && (
-                          <div className="text-[10px] text-muted-foreground mt-1">by {log.performedBy}</div>
-                        )}
+              {/* Right Column (Donut, Team, Tasks) */}
+              <div className="space-y-6">
+                
+                {/* 4. Donut Chart Panel */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h2 className="text-lg font-bold text-foreground mb-2">Department Distribution</h2>
+                  <div className="h-64 relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={stats.departmentDistribution}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={65}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="count"
+                          stroke="none"
+                        >
+                          {stats.departmentDistribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-card)' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      <span className="text-3xl font-bold text-foreground">{stats.totalEmployees}</span>
+                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-2">
+                    {stats.departmentDistribution.map((dept, idx) => (
+                      <div key={dept.department} className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
+                        <span className="text-xs font-medium text-foreground truncate flex-1">{dept.department}</span>
+                        <span className="text-xs text-muted-foreground font-semibold">{dept.count}</span>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-muted-foreground">No recent activity found.</div>
-                  )}
+                    ))}
+                  </div>
                 </div>
+
+                {/* 6. Team Panel */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-bold text-foreground">Department Teams</h2>
+                    <button className="text-sm font-medium text-primary hover:underline">View All</button>
+                  </div>
+                  <div className="space-y-4">
+                    {stats.departmentDistribution.slice(0, 4).map((dept) => (
+                      <div key={dept.department} className="flex items-center justify-between p-3 rounded-lg border border-border bg-background/50 hover:bg-secondary/50 transition-colors cursor-pointer">
+                        <div>
+                          <div className="text-sm font-semibold text-foreground">{dept.department}</div>
+                          <div className="text-xs text-muted-foreground">{dept.count} members</div>
+                        </div>
+                        <div className="flex -space-x-2 overflow-hidden">
+                          {Array.from({ length: Math.min(dept.count, 3) }).map((_, i) => (
+                            <div key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-card bg-primary text-primary-foreground flex flex-col items-center justify-center text-[10px] font-bold">
+                              {dept.department.substring(0, 2).toUpperCase()}
+                            </div>
+                          ))}
+                          {dept.count > 3 && (
+                            <div className="inline-block h-8 w-8 rounded-full ring-2 ring-card bg-muted text-muted-foreground flex flex-col items-center justify-center text-xs font-medium">
+                              +{dept.count - 3}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. Task List Panel */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-bold text-foreground">Recent Activity</h2>
+                  </div>
+                  <div className="space-y-3">
+                    {stats.recentActivity && stats.recentActivity.slice(0, 5).map((log, idx) => (
+                      <div key={log.id} className="flex items-start gap-3 p-3 rounded-r-lg border border-border border-l-4 bg-background/50 hover:bg-secondary/50 transition-colors" style={{ borderLeftColor: CHART_COLORS[idx % CHART_COLORS.length] }}>
+                        <Clock className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-foreground truncate">{log.action}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {new Date(log.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} • {log.performedBy || 'System'}
+                          </div>
+                        </div>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 opacity-50 flex-shrink-0 mt-0.5" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
+
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 }

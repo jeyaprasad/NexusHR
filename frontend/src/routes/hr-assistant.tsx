@@ -2,8 +2,8 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Layout } from "../components/Layout";
 import { apiFetch, getUser } from "../lib/auth";
-import { Sidebar } from "../components/Sidebar";
 import { MessageSquare, Upload, Send } from "lucide-react";
 import { toast } from "sonner";
 
@@ -104,9 +104,8 @@ function HrAssistantPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 flex flex-col h-screen relative">
+    <Layout>
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
         <div className="px-8 py-6 border-b border-border bg-card shadow-sm z-10 shrink-0">
           <div className="flex justify-between items-start">
@@ -214,6 +213,6 @@ function HrAssistantPage() {
           </form>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }

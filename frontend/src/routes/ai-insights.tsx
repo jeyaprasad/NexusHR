@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { apiFetch } from "../lib/auth";
-import { Sidebar } from "../components/Sidebar";
+import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/ai-insights")({
   head: () => ({ meta: [{ title: "AI Insights — InsiiHR" }] }),
@@ -146,8 +146,7 @@ function AiInsightsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
+    <Layout>
       <main className="flex-1 px-8 py-8 max-w-7xl">
         <div className="mb-6">
           <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
@@ -163,16 +162,16 @@ function AiInsightsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border border-border rounded-md p-1 bg-secondary mb-6 w-fit">
+        <div className="flex gap-1 bg-secondary rounded-full p-1 mb-6 w-fit shadow-inner">
           {(Object.entries(INSIGHT_CONFIG) as [InsightType, typeof config][]).map(([key, c]) => (
             <button
               key={key}
               id={`ai-tab-${key}`}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-full transition-all ${
                 activeTab === key
-                  ? "bg-background shadow-sm text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
               }`}
             >
               <span>{c.icon}</span>
@@ -273,7 +272,7 @@ function AiInsightsPage() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }
 

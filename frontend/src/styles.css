@@ -42,6 +42,9 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-border: var(--sidebar-border);
 }
 
 :root {
@@ -54,9 +57,9 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.16 0 0);
 
-  /* Deep Enterprise Indigo */
-  --primary: oklch(0.45 0.15 264);
-  --primary-foreground: oklch(1 0 0);
+  /* Clean Blue Accent */
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
 
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.16 0 0);
@@ -69,21 +72,26 @@
 
   --border: oklch(0.16 0 0 / 12%);
   --input: oklch(0.16 0 0 / 14%);
-  --ring: oklch(0.45 0.15 264);
+  --ring: #2563eb;
 
   --signal-risk: oklch(0.62 0.22 27);
   --signal-ok: oklch(0.7 0.17 156);
+  
+  /* Persistent Dark Sidebar (Light & Dark modes) */
+  --sidebar-bg: #1a1a2e;
+  --sidebar-fg: #f1f5f9;
+  --sidebar-border: #2a2a40;
 }
 
 .dark {
-  --background: oklch(0.16 0 0);
+  --background: #0f172a;
   --foreground: oklch(0.98 0 0);
-  --card: oklch(0.2 0 0);
+  --card: #1e293b;
   --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.2 0 0);
+  --popover: #1e293b;
   --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.55 0.15 264);
-  --primary-foreground: oklch(1 1 1);
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.24 0 0);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.24 0 0);
@@ -94,7 +102,7 @@
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.55 0.15 264);
+  --ring: #3b82f6;
 }
 
 @layer base {

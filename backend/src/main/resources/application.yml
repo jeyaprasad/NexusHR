@@ -24,6 +24,8 @@ spring:
       max-request-size: 20MB
   application:
     name: insiihr
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.transformers.TransformersEmbeddingModelAutoConfiguration
   profiles:
     active: dev
   jpa:

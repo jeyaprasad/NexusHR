@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
-import { Sidebar } from "../components/Sidebar";
+import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/employees")({
   head: () => ({ meta: [{ title: "Employees — InsiiHR" }] }),
@@ -324,8 +324,7 @@ function EmployeesPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
+    <Layout>
       <main className="flex-1 px-8 py-8">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
@@ -388,7 +387,7 @@ function EmployeesPage() {
         {/* Create / Edit Employee Modal */}
         {isAdding && (
           <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-card border border-border w-full max-w-lg rounded-lg shadow-2xl p-6 relative">
+            <div className="bg-card border border-border w-full max-w-lg rounded-lg shadow-lg p-6 relative">
               <button
                 onClick={closeForm}
                 className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xl cursor-pointer"
@@ -724,6 +723,6 @@ function EmployeesPage() {
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { apiFetch } from "../lib/auth";
-import { Sidebar } from "../components/Sidebar";
+import { apiFetch, getUser } from "../lib/auth";
+import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/performance")({
   head: () => ({ meta: [{ title: "Performance — InsiiHR" }] }),
@@ -39,13 +39,18 @@ const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "text-green-600 bg-green-50 border-green-200",
 };
 
+import { Star } from "lucide-react";
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={s <= rating ? "text-primary" : "text-border"}>
-          ?
-        </span>
+        <Star
+          key={s}
+          className={`w-4 h-4 ${
+            s <= rating ? "fill-primary text-primary" : "fill-transparent text-border"
+          }`}
+        />
       ))}
     </div>
   );
@@ -70,8 +75,7 @@ function PerformancePage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
+    <Layout>
       <main className="flex-1 px-8 py-8">
         <div className="mb-6">
           <div className="font-mono text-[10px] text-primary tracking-[0.25em] uppercase mb-1">
@@ -136,6 +140,6 @@ function PerformancePage() {
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 }

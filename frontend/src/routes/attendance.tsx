@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { apiFetch } from "../lib/auth";
-import { Sidebar } from "../components/Sidebar";
+import { apiFetch, getUser } from "../lib/auth";
+import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/attendance")({
   head: () => ({ meta: [{ title: "Attendance — InsiiHR" }] }),
@@ -78,8 +78,7 @@ function AttendancePage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
+    <Layout>
       <main className="flex-1 px-8 py-8">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
@@ -151,6 +150,6 @@ function AttendancePage() {
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 }
