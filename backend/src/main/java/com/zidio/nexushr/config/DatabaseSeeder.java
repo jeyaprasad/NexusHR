@@ -1,4 +1,4 @@
-﻿package com.zidio.nexushr.config;
+package com.zidio.nexushr.config;
 
 import com.zidio.nexushr.entity.*;
 import com.zidio.nexushr.repository.*;

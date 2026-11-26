@@ -1,4 +1,4 @@
-﻿CREATE TABLE audit_logs (
+CREATE TABLE audit_logs (
     id BIGSERIAL PRIMARY KEY,
     action VARCHAR(255) NOT NULL,
     entity_type VARCHAR(255) NOT NULL,

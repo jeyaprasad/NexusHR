@@ -1,4 +1,4 @@
-﻿package com.zidio.nexushr.config;
+package com.zidio.nexushr.config;
 
 /**
  * CORS configuration has been moved into {@link SecurityConfig#corsConfigurationSource()}.

@@ -1,4 +1,4 @@
-﻿package com.zidio.nexushr.service;
+package com.zidio.nexushr.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

@@ -11,9 +11,8 @@ spring:
       # Redis — disable Redis auto-configuration; use in-memory CacheManager instead
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
-      - org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration
-      # Mail — disable mail sender
-      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
+      # Mail health check auto-config
+      - org.springframework.boot.actuate.autoconfigure.mail.MailHealthContributorAutoConfiguration
   datasource:
     url: jdbc:h2:mem:nexushr_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
@@ -29,7 +28,6 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        # Ignore column-level DDL hints (BYTEA, TEXT, etc.) which are PostgreSQL-specific
         globally_quoted_identifiers: false
   data:
     redis:
@@ -50,6 +48,11 @@ spring:
   mail:
     host: localhost
     port: 1025
+
+management:
+  health:
+    mail:
+      enabled: false
 
 app:
   jwt:

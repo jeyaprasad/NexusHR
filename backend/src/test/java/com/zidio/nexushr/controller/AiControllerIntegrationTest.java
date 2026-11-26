@@ -1,4 +1,4 @@
-﻿package com.zidio.nexushr.controller;
+package com.zidio.nexushr.controller;
 
 import com.zidio.nexushr.security.CustomUserDetailsService;
 import com.zidio.nexushr.security.JwtTokenProvider;

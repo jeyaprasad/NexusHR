@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "employees", indexes = {
-    @Index(name = "idx_emp_employee_id", columnList = "employeeId", unique = true),
+    @Index(name = "idx_emp_employee_id", columnList = "employee_id", unique = true),
     @Index(name = "idx_emp_email", columnList = "email", unique = true),
     @Index(name = "idx_emp_department", columnList = "department"),
     @Index(name = "idx_emp_status", columnList = "status"),
@@ -24,7 +24,7 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "employee_id", unique = true, nullable = false)
     private String employeeId;
 
     @Column(nullable = false)
@@ -60,7 +60,6 @@ public class Employee {
 
     private LocalDateTime updatedAt;
 
-    @Lob
     @Column(name = "experience_letter_data")
     private byte[] experienceLetterData;
 
@@ -70,7 +69,6 @@ public class Employee {
     @Column(name = "experience_letter_content_type")
     private String experienceLetterContentType;
 
-    @Lob
     @Column(name = "graduation_certificate_data")
     private byte[] graduationCertificateData;
 

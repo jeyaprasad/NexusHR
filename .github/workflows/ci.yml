@@ -45,7 +45,7 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           GROQ_API_KEY: mock-ci-key
-        run: ./mvnw clean package -Dspring.profiles.active=test -B
+        run: ./mvnw clean package "-Dspring.profiles.active=test" -B
 
   # 2. React Frontend Build & Lint
   frontend-build:

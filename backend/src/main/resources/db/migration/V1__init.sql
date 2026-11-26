@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- NexusHR — V1: Initial Schema
 -- Generated for PostgreSQL 17
 -- Replaces Hibernate ddl-auto: update for production-safe schema management
