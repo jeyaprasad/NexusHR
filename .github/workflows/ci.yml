@@ -1,4 +1,4 @@
-name: InsiiHR CI/CD Pipeline
+name: NexusHR CI/CD Pipeline
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_DB: insiihr
+          POSTGRES_DB: nexushr
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:

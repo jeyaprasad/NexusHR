@@ -51,6 +51,9 @@ class AiControllerIntegrationTest {
     @MockBean
     private CustomUserDetailsService customUserDetailsService;
 
+    @MockBean
+    private com.zidio.nexushr.service.EmployeeService employeeService;
+
     @Test
     @WithMockUser
     void testAskHrPolicy() throws Exception {
