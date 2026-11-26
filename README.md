@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B%20%7C%20pgvector-336791?style=flat-square&logo=postgresql)](https://github.com/pgvector/pgvector)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=flat-square&logo=github-actions)](.github/workflows/ci.yml)
 
 ---
 
@@ -88,7 +88,7 @@ The database seeds three default evaluation accounts on initialization:
 | **HR** | `hr@nexushr.com` | `hr123` | Employee lifecycle, payroll, attendance, leave approval, reviews |
 | **EMPLOYEE** | `employee@nexushr.com` | `employee123` | Self-service profile, attendance check-in, leave application, payslips |
 
-*Demo credentials can also be auto-populated directly from the sign-in page.*
+*Demo credentials can also be populated with 1-click **"Sign in"** buttons directly on the `/login` screen.*
 
 ---
 
@@ -119,13 +119,14 @@ NexusHR/
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── infra/                         # Production Infrastructure
-│   ├── k8s/                       # Kubernetes deployment manifests
-│   └── helm/                      # Helm chart configurations
-│
-├── docker-compose.yml             # Orchestration configuration
+├── helm/                          # Production Helm chart configurations
+├── k8s/                           # Kubernetes resource manifests
+├── docker-compose.yml             # Full-stack container orchestration
+├── NEXUSHR_PROJECT_REPORT.md      # Detailed architecture & technical report
 └── README.md
 ```
+
+> 📖 **Deep Dive:** For full architectural diagrams, database migration history, security access matrix, and test benchmarks, refer to the [Complete NexusHR Project Report](NEXUSHR_PROJECT_REPORT.md).
 
 ---
 
