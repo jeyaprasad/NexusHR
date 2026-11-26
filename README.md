@@ -107,8 +107,9 @@ NexusHR/
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── helm/                          # Production Helm chart configurations
-├── k8s/                           # Kubernetes resource manifests
+├── infra/
+│   ├── helm/                      # Production Helm chart configurations
+│   └── k8s/                       # Kubernetes resource manifests
 ├── docker-compose.yml             # Full-stack container orchestration
 ├── NEXUSHR_PROJECT_REPORT.md      # Detailed architecture & technical report
 └── README.md
