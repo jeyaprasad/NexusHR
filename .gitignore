@@ -34,6 +34,24 @@ build/
 
 ### Logs ###
 logs/
+*.log
 
 ### Secrets ###
 .env
+.env.*
+!.env.example
+
+### Node / Frontend ###
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
+.tanstack/
+.nitro/
+
+### Uploads & OS ###
+uploads/
+app/uploads/
+.DS_Store
+Thumbs.db

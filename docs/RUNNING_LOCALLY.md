@@ -11,9 +11,9 @@ docker compose up -d --build
 
 ## 2. Default Login
 The database automatically seeds three default users for each role on startup:
-- **ADMIN**: `admin@insiihr.com` / `admin123`
-- **HR**: `hr@insiihr.com` / `hr123`
-- **EMPLOYEE**: `employee@insiihr.com` / `employee123`
+- **ADMIN**: `admin@nexushr.com` / `admin123`
+- **HR**: `hr@nexushr.com` / `hr123`
+- **EMPLOYEE**: `employee@nexushr.com` / `employee123`
 
 ## 3. Important URLs
 - **Frontend App (Login here):** [http://localhost:3000](http://localhost:3000)

@@ -1,4 +1,4 @@
-CREATE EXTENSION IF NOT EXISTS vector;
+﻿CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS vector_store (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,

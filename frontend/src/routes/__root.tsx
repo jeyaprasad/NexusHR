@@ -73,14 +73,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "InsiiHR — Enterprise HR, Intelligence-First" },
+      { title: "NexusHR — Enterprise HR, Intelligence-First" },
       {
         name: "description",
         content:
           "Unified architecture for the modern employee lifecycle. Built on Java 21 and Spring AI for performance-critical global workforce management.",
       },
-      { name: "author", content: "InsiiHR" },
-      { property: "og:title", content: "InsiiHR — Enterprise HR, Intelligence-First" },
+      { name: "author", content: "NexusHR" },
+      { property: "og:title", content: "NexusHR — Enterprise HR, Intelligence-First" },
       {
         property: "og:description",
         content:

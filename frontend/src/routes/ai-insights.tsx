@@ -1,13 +1,13 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { apiFetch } from "../lib/auth";
 import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/ai-insights")({
-  head: () => ({ meta: [{ title: "AI Insights — InsiiHR" }] }),
+  head: () => ({ meta: [{ title: "AI Insights — NexusHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token") && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -82,8 +82,24 @@ function AiInsightsPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [workforceStats, setWorkforceStats] = useState<{
+    totalEmployees: number;
+    avgAttritionRisk: number;
+    avgEngagement: number;
+    highRiskCount: number;
+    departmentBreakdown: { department: string; count: number }[];
+  } | null>(null);
 
   const config = INSIGHT_CONFIG[activeTab];
+
+  useEffect(() => {
+    apiFetch("/api/ai/workforce")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && !data.error) setWorkforceStats(data);
+      })
+      .catch(() => {});
+  }, []);
 
   // Reset form when changing tabs
   useEffect(() => {
@@ -160,6 +176,38 @@ function AiInsightsPage() {
             scoring.
           </p>
         </div>
+
+        {/* Workforce Overview Cards (from commit 64d6a36) */}
+        {workforceStats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Headcount</div>
+              <div className="text-2xl font-bold font-display mt-1">{workforceStats.totalEmployees}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Monitored in NexusHR</div>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Attrition Risk</div>
+              <div className="text-2xl font-bold font-display mt-1 text-amber-500">
+                {Math.round((workforceStats.avgAttritionRisk || 0) * 100)}%
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Predictive algorithmic model</div>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Engagement</div>
+              <div className="text-2xl font-bold font-display mt-1 text-emerald-500">
+                {Math.round((workforceStats.avgEngagement || 0) * 100)}%
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Attendance + review weighted</div>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">High Flight Risks</div>
+              <div className="text-2xl font-bold font-display mt-1 text-rose-500">
+                {workforceStats.highRiskCount}
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">&gt;60% calculated probability</div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 bg-secondary rounded-full p-1 mb-6 w-fit shadow-inner">

@@ -1,4 +1,4 @@
-﻿apiVersion: v1
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
@@ -12,23 +12,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: insiihr-db
+  name: nexushr-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: insiihr-db
+      app: nexushr-db
   template:
     metadata:
       labels:
-        app: insiihr-db
+        app: nexushr-db
     spec:
       containers:
         - name: postgres
           image: postgres:17-alpine
           env:
             - name: POSTGRES_DB
-              value: insiihr
+              value: nexushr
             - name: POSTGRES_USER
               value: postgres
             - name: POSTGRES_PASSWORD
@@ -51,4 +51,4 @@ spec:
   ports:
     - port: 5432
   selector:
-    app: insiihr-db
+    app: nexushr-db

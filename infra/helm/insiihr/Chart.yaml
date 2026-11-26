@@ -1,6 +1,0 @@
-﻿apiVersion: v2
-name: insiihr
-description: A Helm chart for deploying the InsiiHR AI-enabled enterprise HR platform
-type: application
-version: 0.1.0
-appVersion: "1.0.0"

@@ -1,16 +1,17 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { Info, Copy, Check } from "lucide-react";
+import { handleMockApiRequest } from "../lib/mockData";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign In — InsiiHR" },
-      { name: "description", content: "Sign in to InsiiHR Enterprise HR Platform" },
+      { title: "Sign In — NexusHR" },
+      { name: "description", content: "Sign in to NexusHR Enterprise HR Platform" },
     ],
   }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && (localStorage.getItem("nexushr_token") || localStorage.getItem("insiihr_token"))) {
       throw redirect({ to: "/dashboard" });
     }
   },
@@ -45,18 +46,47 @@ function LoginPage() {
       const endpoint = isRegistering ? "/api/auth/register" : "/api/auth/login";
       const payload = isRegistering ? { email, password, fullName, role } : { email, password };
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+      let res: Response | null = null;
+      try {
+        res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        // Live server offline or proxy network error -> fallback to mock handler
+        res = handleMockApiRequest(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      // If backend returned 502/504 Bad Gateway from Vite proxy or server failure
+      if (!res || (!res.ok && res.status >= 500)) {
+        const mockRes = handleMockApiRequest(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (mockRes) {
+          res = mockRes;
+        }
+      }
+
+      if (!res || !res.ok) {
+        const data = res ? await res.json().catch(() => ({})) : {};
         throw new Error(
           data.message || data.error || (isRegistering ? "Registration failed" : "Invalid credentials"),
         );
       }
       const data = await res.json();
+      localStorage.setItem("nexushr_token", data.token);
+      localStorage.setItem("nexushr_refresh", data.refreshToken);
+      localStorage.setItem(
+        "nexushr_user",
+        JSON.stringify({ email: data.email, fullName: data.fullName, role: data.role }),
+      );
       localStorage.setItem("insiihr_token", data.token);
       localStorage.setItem("insiihr_refresh", data.refreshToken);
       localStorage.setItem(
@@ -79,7 +109,7 @@ function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <a href="/" className="font-display text-2xl font-extrabold tracking-tighter">
-            INSII<span className="text-primary">HR</span>
+            NEXUS<span className="text-primary">HR</span>
           </a>
           <p className="mt-2 text-sm text-muted-foreground">
             {isRegistering ? "Create your account" : "Sign in to your workspace"}
@@ -211,18 +241,30 @@ function LoginPage() {
               </h3>
               <div className="space-y-2">
                 {[
-                  { role: "ADMIN", email: "admin@insiihr.com", pass: "admin123" },
-                  { role: "HR", email: "hr@insiihr.com", pass: "hr123" },
-                  { role: "EMPLOYEE", email: "employee@insiihr.com", pass: "employee123" },
+                  { role: "ADMIN", email: "admin@nexushr.com", pass: "admin123" },
+                  { role: "HR", email: "hr@nexushr.com", pass: "hr123" },
+                  { role: "EMPLOYEE", email: "employee@nexushr.com", pass: "employee123" },
                 ].map((cred) => (
-                  <div key={cred.role} className="flex items-center justify-between text-xs font-mono bg-background p-2 rounded border border-border/50">
+                  <div
+                    key={cred.role}
+                    onClick={() => {
+                      setEmail(cred.email);
+                      setPassword(cred.pass);
+                      setError("");
+                    }}
+                    className="flex items-center justify-between text-xs font-mono bg-background p-2 rounded border border-border/50 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-colors group"
+                    title="Click to fill credentials"
+                  >
                     <div>
-                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role}</div>
+                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role} <span className="text-[9px] font-normal text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">(Click to use)</span></div>
                       <div className="text-muted-foreground"><span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span></div>
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleCopyDemoCreds(cred.role, cred.email, cred.pass)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyDemoCreds(cred.role, cred.email, cred.pass);
+                      }}
                       className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary cursor-pointer"
                       title={`Copy ${cred.role} credentials`}
                     >
@@ -251,7 +293,7 @@ function LoginPage() {
         </div>
 
         <p className="mt-8 text-center font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          © 2026 InsiiHR Enterprise
+          © 2026 NexusHR Enterprise
         </p>
       </div>
     </div>

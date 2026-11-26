@@ -1,16 +1,16 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: insiihr-redis
+  name: nexushr-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: insiihr-redis
+      app: nexushr-redis
   template:
     metadata:
       labels:
-        app: insiihr-redis
+        app: nexushr-redis
     spec:
       containers:
         - name: redis
@@ -26,4 +26,4 @@ spec:
   ports:
     - port: 6379
   selector:
-    app: insiihr-redis
+    app: nexushr-redis

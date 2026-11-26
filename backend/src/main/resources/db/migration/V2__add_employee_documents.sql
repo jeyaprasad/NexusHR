@@ -1,5 +1,5 @@
 ﻿-- =============================================================================
--- InsiiHR — V2: Add Employee Documents
+-- NexusHR — V2: Add Employee Documents
 -- Adds support for experience letters and graduation certificates
 -- =============================================================================
 

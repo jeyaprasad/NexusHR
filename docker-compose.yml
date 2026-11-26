@@ -1,11 +1,11 @@
-name: insii-hr
+name: nexushr
 services:
-  # 1. PostgreSQL Database
+  # 1. PostgreSQL Database with pgvector extension support
   db:
     image: pgvector/pgvector:pg16
-    container_name: insiihr-db
+    container_name: nexushr-db
     environment:
-      POSTGRES_DB: insiihr
+      POSTGRES_DB: nexushr
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -13,10 +13,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # 2. Redis Cache
+  # 2. Redis Cache & Rate Limiting
   redis:
     image: redis:7-alpine
-    container_name: insiihr-redis
+    container_name: nexushr-redis
     ports:
       - "6379:6379"
 
@@ -25,15 +25,16 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: insiihr-backend
+    container_name: nexushr-backend
     ports:
       - "8080:8080"
     volumes:
       - onnx-cache:/tmp/spring-ai-onnx-generative
       - djl-cache:/root/.cache/djl
+      - uploads-data:/app/uploads
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/insiihr
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/nexushr
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_DATA_REDIS_HOST=redis
@@ -51,7 +52,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: insiihr-frontend
+    container_name: nexushr-frontend
     ports:
       - "3000:3000"
     volumes:
@@ -63,8 +64,38 @@ services:
     depends_on:
       - backend
 
+  # 5. Prometheus Metrics Scraper
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nexushr-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+
+  # 6. Grafana Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nexushr-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
 
 volumes:
   pgdata:
   onnx-cache:
   djl-cache:
+  uploads-data:
+  prometheus_data:
+  grafana_data:

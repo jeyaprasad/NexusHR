@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { Users, UserCheck, Calendar, Clock, LayoutDashboard, Sparkles, ShieldCheck, Database, Server } from "lucide-react";
 
 type Feature = { n: string; title: string; desc: string; icon: any; featured?: boolean };
@@ -67,7 +67,7 @@ const INFRA = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HR-Flow — Enterprise HR, Intelligence-First" },
+      { title: "NexusHR — Enterprise HR, Intelligence-First" },
       {
         name: "description",
         content:
@@ -86,7 +86,7 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <a href="/" className="font-display text-xl font-extrabold tracking-tighter text-white">
-              INSII<span className="text-primary">HR</span>
+              NEXUS<span className="text-primary">HR</span>
             </a>
             <div className="hidden md:flex gap-7 text-sm font-medium text-white/70">
               <a href="#platform" className="hover:text-white transition-colors">Platform</a>
@@ -250,10 +250,10 @@ function LandingPage() {
       <footer className="py-10 border-t" style={{ backgroundColor: '#1A1A2E', borderColor: '#2A2A40', color: 'white' }}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-display font-extrabold tracking-tighter">
-            INSII<span className="text-primary">HR</span>
+            NEXUS<span className="text-primary">HR</span>
           </span>
           <div className="font-mono text-xs text-white/50 uppercase tracking-widest">
-            © 2026 InsiiHR Platform
+            © 2026 NexusHR Platform
           </div>
         </div>
       </footer>

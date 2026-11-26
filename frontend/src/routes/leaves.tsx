@@ -1,13 +1,13 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
 import { Layout } from "../components/Layout";
 import { Clock, CheckCircle, XCircle, Ban, Calendar, MessageSquare, AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/leaves")({
-  head: () => ({ meta: [{ title: "Leaves — InsiiHR" }] }),
+  head: () => ({ meta: [{ title: "Leaves — NexusHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token") && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -208,18 +208,37 @@ function LeavesPage() {
               </div>
               <h1 className="font-display text-3xl font-extrabold tracking-tight">Leaves</h1>
             </div>
-            <button
-              onClick={() => {
-                setIsApplying(true);
-                setError("");
-                if (user && user.role === "EMPLOYEE" && currentEmployee) {
-                  setNewLeave((prev) => ({ ...prev, employeeId: String(currentEmployee.id) }));
-                }
-              }}
-              className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
-            >
-              Apply Leave
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={async () => {
+                  const res = await apiFetch("/api/export/leaves");
+                  if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "leaves.csv";
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                  }
+                }}
+                className="px-4 py-2 text-sm font-semibold border border-border rounded-md hover:bg-secondary transition-colors cursor-pointer"
+              >
+                Export CSV
+              </button>
+              <button
+                onClick={() => {
+                  setIsApplying(true);
+                  setError("");
+                  if (user && user.role === "EMPLOYEE" && currentEmployee) {
+                    setNewLeave((prev) => ({ ...prev, employeeId: String(currentEmployee.id) }));
+                  }
+                }}
+                className="px-4 py-2 text-sm font-semibold bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors cursor-pointer"
+              >
+                Apply Leave
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

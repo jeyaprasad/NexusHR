@@ -1,7 +1,7 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: insiihr-frontend
+  name: nexushr-frontend
   labels:
     app: frontend
 spec:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: insiihr-frontend:latest
+          image: nexushr-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

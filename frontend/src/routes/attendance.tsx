@@ -1,12 +1,12 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch, getUser } from "../lib/auth";
 import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/attendance")({
-  head: () => ({ meta: [{ title: "Attendance — InsiiHR" }] }),
+  head: () => ({ meta: [{ title: "Attendance — NexusHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token") && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -89,6 +89,23 @@ function AttendancePage() {
             <p className="text-sm text-muted-foreground mt-1">{today}</p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={async () => {
+                const res = await apiFetch("/api/export/attendance");
+                if (res.ok) {
+                  const blob = await res.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "attendance.csv";
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                }
+              }}
+              className="px-4 py-2 text-sm font-semibold border border-border rounded-md hover:bg-secondary transition-colors cursor-pointer"
+            >
+              Export CSV
+            </button>
             <button
               onClick={handleAutoProcess}
               disabled={autoProcessing}

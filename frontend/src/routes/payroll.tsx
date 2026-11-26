@@ -1,12 +1,12 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import { Layout } from "../components/Layout";
 
 export const Route = createFileRoute("/payroll")({
-  head: () => ({ meta: [{ title: "Payroll — InsiiHR" }] }),
+  head: () => ({ meta: [{ title: "Payroll — NexusHR" }] }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token") && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -111,6 +111,23 @@ function PayrollPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={async () => {
+                const res = await apiFetch("/api/export/payroll");
+                if (res.ok) {
+                  const blob = await res.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "payroll.csv";
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                }
+              }}
+              className="px-4 py-2 text-sm font-semibold border border-border rounded-md hover:bg-secondary transition-colors cursor-pointer"
+            >
+              Export CSV
+            </button>
             <input
               type="text"
               value={batchPayPeriod}

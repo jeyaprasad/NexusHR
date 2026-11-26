@@ -39,19 +39,19 @@ export function Header() {
     "/ai-insights": "AI Insights",
     "/hr-assistant": "HR Assistant",
   };
-  const title = titleMap[pathname] || "InsiiHR";
+  const title = titleMap[pathname] || "NexusHR";
 
   return (
-    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-40">
+    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-40 gap-4">
       {/* Left: Page Title */}
-      <div className="w-1/4">
+      <div className="flex items-center shrink-0">
         <h1 className="text-xl font-display font-bold text-foreground tracking-tight">{title}</h1>
       </div>
 
       {/* Center: Search */}
-      <div className="flex-1 max-w-md">
+      <div className="flex-1 max-w-sm hidden sm:block">
         <div className="flex items-center bg-secondary/50 rounded-md px-3 py-1.5 border border-border focus-within:ring-2 focus-within:ring-primary/50 transition-all">
-          <Search className="w-4 h-4 text-muted-foreground mr-2" />
+          <Search className="w-4 h-4 text-muted-foreground mr-2 shrink-0" />
           <input 
             type="text" 
             placeholder="Search employees, documents..." 
@@ -61,7 +61,7 @@ export function Header() {
       </div>
 
       {/* Right: Actions & Profile */}
-      <div className="w-1/4 flex items-center justify-end gap-4">
+      <div className="flex items-center justify-end gap-3 shrink-0">
         {/* Add New Dropdown */}
         <div className="hidden lg:block relative group">
           <button className="flex h-9 px-3 bg-primary text-primary-foreground text-sm font-medium rounded-md shadow-sm items-center gap-1.5 hover:bg-primary/90 transition-colors cursor-pointer">

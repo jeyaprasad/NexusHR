@@ -1,6 +1,6 @@
 # HR Chatbot Deep-Dive Explainer
 
-This document provides a focused, detailed breakdown of the AI architecture powering the Insii HR Assistant chatbot. It explains the mechanics of the Retrieval-Augmented Generation (RAG) pipeline, the specific technology stack used, and how guardrails are implemented to ensure safe and accurate responses to employee queries.
+This document provides a focused, detailed breakdown of the AI architecture powering the NexusHR Assistant chatbot. It explains the mechanics of the Retrieval-Augmented Generation (RAG) pipeline, the specific technology stack used, and how guardrails are implemented to ensure safe and accurate responses to employee queries.
 
 ---
 

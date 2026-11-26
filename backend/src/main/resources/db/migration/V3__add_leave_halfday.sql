@@ -1,5 +1,5 @@
 ﻿-- =============================================================================
--- InsiiHR — V3: Add Leave Halfday
+-- NexusHR — V3: Add Leave Halfday
 -- Support decimal leave balance and half-day flag
 -- =============================================================================
 

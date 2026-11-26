@@ -9,10 +9,10 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.zidio</groupId>
-	<artifactId>insiihr</artifactId>
+	<artifactId>nexushr</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>InsiiHR</name>
-	<description>AI-Enabled Enterprise HR &amp; Workforce Intelligence Platform</description>
+	<name>NexusHR</name>
+	<description>NexusHR Enterprise HR &amp; Workforce Intelligence Platform</description>
 
 	<properties>
 		<java.version>21</java.version>

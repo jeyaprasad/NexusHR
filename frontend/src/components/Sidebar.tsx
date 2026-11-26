@@ -36,6 +36,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Support",
     items: [
       { label: "AI Insights", href: "/ai-insights", icon: Sparkles, roles: ["ADMIN", "HR"] },
+      { label: "HR Assistant", href: "/hr-assistant", icon: MessageSquare },
     ],
   },
 ];
@@ -70,7 +71,7 @@ export function Sidebar() {
       {/* Header / Logo */}
       <div className="h-16 px-6 flex items-center border-b" style={{ borderColor: 'var(--color-sidebar-border)' }}>
         <Link to="/dashboard" className="font-display text-lg font-extrabold tracking-tighter text-white">
-          INSII<span className="text-primary">HR</span>
+          NEXUS<span className="text-primary">HR</span>
         </Link>
       </div>
 

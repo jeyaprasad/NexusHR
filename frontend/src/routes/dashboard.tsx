@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+﻿import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/auth";
 import {
@@ -11,12 +11,12 @@ import { Layout } from "../components/Layout";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — InsiiHR" },
-      { name: "description", content: "InsiiHR Admin Dashboard with real-time HR metrics" },
+      { title: "Dashboard — NexusHR" },
+      { name: "description", content: "NexusHR Admin Dashboard with real-time HR metrics" },
     ],
   }),
   beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("insiihr_token")) {
+    if (typeof window !== "undefined" && !localStorage.getItem("nexushr_token") && !localStorage.getItem("insiihr_token")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -137,7 +137,7 @@ function DashboardPage() {
                   </div>
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={stats.headcountHistory} barGap={4}>
+                      <BarChart data={stats.headcountHistory || []} barGap={4}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                         <XAxis 
                           dataKey="date" 
@@ -201,7 +201,7 @@ function DashboardPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={stats.departmentDistribution}
+                          data={stats.departmentDistribution || []}
                           cx="50%"
                           cy="50%"
                           innerRadius={65}
@@ -210,7 +210,7 @@ function DashboardPage() {
                           dataKey="count"
                           stroke="none"
                         >
-                          {stats.departmentDistribution.map((entry, index) => (
+                          {(stats.departmentDistribution || []).map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                           ))}
                         </Pie>
@@ -223,7 +223,7 @@ function DashboardPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-2">
-                    {stats.departmentDistribution.map((dept, idx) => (
+                    {(stats.departmentDistribution || []).map((dept, idx) => (
                       <div key={dept.department} className="flex items-center gap-2">
                         <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
                         <span className="text-xs font-medium text-foreground truncate flex-1">{dept.department}</span>
@@ -240,7 +240,7 @@ function DashboardPage() {
                     <button className="text-sm font-medium text-primary hover:underline">View All</button>
                   </div>
                   <div className="space-y-4">
-                    {stats.departmentDistribution.slice(0, 4).map((dept) => (
+                    {(stats.departmentDistribution || []).slice(0, 4).map((dept) => (
                       <div key={dept.department} className="flex items-center justify-between p-3 rounded-lg border border-border bg-background/50 hover:bg-secondary/50 transition-colors cursor-pointer">
                         <div>
                           <div className="text-sm font-semibold text-foreground">{dept.department}</div>
