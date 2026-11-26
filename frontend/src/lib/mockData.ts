@@ -2,9 +2,6 @@ export const MOCK_USERS: Record<string, { role: string; fullName: string; pass: 
   "admin@nexushr.com": { role: "ADMIN", fullName: "Karthik Subramanian (Admin)", pass: "admin123" },
   "hr@nexushr.com": { role: "HR", fullName: "Priya Natarajan (HR)", pass: "hr123" },
   "employee@nexushr.com": { role: "EMPLOYEE", fullName: "Anitha Murugesan", pass: "employee123" },
-  "admin@insiihr.com": { role: "ADMIN", fullName: "Karthik Subramanian (Admin)", pass: "admin123" },
-  "hr@insiihr.com": { role: "HR", fullName: "Priya Natarajan (HR)", pass: "hr123" },
-  "employee@insiihr.com": { role: "EMPLOYEE", fullName: "Anitha Murugesan", pass: "employee123" },
 };
 
 export const MOCK_EMPLOYEES = [

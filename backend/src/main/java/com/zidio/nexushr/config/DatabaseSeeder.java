@@ -24,6 +24,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final LeaveRepository leaveRepository;
     private final PerformanceReviewRepository performanceReviewRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.springframework.beans.factory.ObjectProvider<org.springframework.ai.vectorstore.VectorStore> vectorStoreProvider;
 
     @Override
     public void run(String... args) throws Exception {
@@ -184,6 +185,24 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .build();
 
             performanceReviewRepository.save(review);
+
+            // 6. Seed Default HR Policy Handbook into Vector Store
+            org.springframework.ai.vectorstore.VectorStore vectorStore = vectorStoreProvider.getIfAvailable();
+            if (vectorStore != null) {
+                try {
+                    String policyText = "NexusHR Comprehensive Enterprise Policy Handbook:\n"
+                            + "- Standard Work Hours: 9:00 AM to 6:00 PM, Monday through Friday, with flexible hybrid options.\n"
+                            + "- Annual Paid Leave: Full-time employees receive 30 days of paid leave per calendar year (accrued monthly).\n"
+                            + "- Sick Leave: Up to 12 paid sick days per year, with medical certificate required for absences exceeding 2 consecutive days.\n"
+                            + "- Parental Leave: Maternity leave is up to 26 weeks fully paid. Paternity leave is 4 weeks fully paid.\n"
+                            + "- Compensation & Payroll: Payroll is disbursed on the 28th of each calendar month via direct deposit.\n"
+                            + "- Health Coverage: Comprehensive medical insurance covering inpatient hospitalisation up to $500,000 for employee, spouse, and dependents.";
+                    vectorStore.add(List.of(new org.springframework.ai.document.Document(policyText)));
+                    log.info("Default HR policy handbook ingested into VectorStore.");
+                } catch (Exception e) {
+                    log.warn("Could not seed default policy handbook into VectorStore: {}", e.getMessage());
+                }
+            }
 
             log.info("Database seeding complete.");
         }

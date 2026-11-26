@@ -28,53 +28,41 @@
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Local Development Setup (No Docker Required)
 
-Run the full stack (Frontend, Backend, PostgreSQL with pgvector, and Redis) with a single command:
+NexusHR can run completely locally on your host machine without needing Docker, PostgreSQL, or Redis. In `dev` mode, the backend automatically uses an embedded in-memory database with automatic schema creation and in-memory caching.
+
+#### 1. Backend (Spring Boot 3 + Java 21)
+**Prerequisites:** JDK 21+ and Maven (wrapper included).
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+*The backend API will start on [http://localhost:8080](http://localhost:8080) with automatic database seeding.*
+
+#### 2. Frontend (React 19 + TanStack Start)
+**Prerequisites:** Node.js 20+ and npm.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*The frontend web application will start on [http://localhost:3000](http://localhost:3000) with automatic API reverse-proxying.*
+
+---
+
+### Option 2: Docker Compose (Optional Containerized Setup)
+
+If Docker is available, you can optionally launch the full production-like containerized stack (Frontend, Backend, PostgreSQL with pgvector, and Redis) with a single command:
 
 ```bash
 # 1. Clone repository
 git clone <repository-url>
 cd NexusHR
 
-# 2. Launch all services
+# 2. Launch all container services
 docker compose up -d --build
 ```
-
-| Service | Access URL | Description |
-| :--- | :--- | :--- |
-| **Frontend Application** | [http://localhost:3000](http://localhost:3000) | TanStack Start (React 19) SSR web interface |
-| **Backend REST API** | [http://localhost:8080/api](http://localhost:8080/api) | Spring Boot 3 REST endpoints |
-| **OpenAPI / Swagger UI** | [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) | Interactive API documentation |
-| **PostgreSQL Database** | `localhost:5432` | Primary database (`nexushr` db with `pgvector`) |
-| **Redis Cache** | `localhost:6379` | Distributed session cache & rate limiting |
-
-To stop and reset all container volumes:
-```bash
-docker compose down -v
-```
-
----
-
-### Option 2: Local Development Setup
-
-#### Backend (Spring Boot 3 + Java 21)
-Prerequisites: JDK 21+, Maven 3.9+, PostgreSQL with pgvector, and Redis running.
-
-```bash
-cd backend
-./mvnw clean spring-boot:run
-```
-
-#### Frontend (React 19 + TanStack Start)
-Prerequisites: Node.js 20+ and npm / bun.
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-The frontend dev server will be available at [http://localhost:3000](http://localhost:3000).
 
 ---
 

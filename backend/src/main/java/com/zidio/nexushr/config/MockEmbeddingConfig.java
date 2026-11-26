@@ -19,15 +19,25 @@ public class MockEmbeddingConfig {
     @Primary
     public EmbeddingModel mockEmbeddingModel() {
         return new EmbeddingModel() {
+            private float[] generateVector(String text) {
+                float[] v = new float[384];
+                java.util.Arrays.fill(v, 0.05f);
+                int hash = (text != null) ? text.hashCode() : 42;
+                for (int i = 0; i < 384; i++) {
+                    v[i] += (float) Math.sin(hash + i) * 0.01f;
+                }
+                return v;
+            }
+
             @Override
             public float[] embed(org.springframework.ai.document.Document document) {
-                return new float[384];
+                return generateVector(document.getText());
             }
 
             @Override
             public EmbeddingResponse call(EmbeddingRequest request) {
                 List<Embedding> embeddings = request.getInstructions().stream()
-                        .map(instruction -> new Embedding(new float[384], 0))
+                        .map(instruction -> new Embedding(generateVector(instruction), 0))
                         .collect(Collectors.toList());
                 return new EmbeddingResponse(embeddings);
             }
@@ -37,5 +47,11 @@ public class MockEmbeddingConfig {
                 return 384;
             }
         };
+    }
+
+    @Bean
+    @org.springframework.context.annotation.Profile("dev")
+    public org.springframework.ai.vectorstore.VectorStore devVectorStore(EmbeddingModel embeddingModel) {
+        return org.springframework.ai.vectorstore.SimpleVectorStore.builder(embeddingModel).build();
     }
 }

@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api-docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info").permitAll()
                 .requestMatchers("/actuator/metrics", "/actuator/health/liveness", "/actuator/health/readiness").permitAll()
-                .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/favicon.ico").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

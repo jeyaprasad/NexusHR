@@ -36,7 +36,7 @@ public class DocumentController {
     }
 
     @GetMapping("/download/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN','HR') or @documentService.isOwner(#id, authentication.name)")
     public ResponseEntity<Resource> download(@PathVariable Long id) throws IOException {
         Resource resource = documentService.downloadDocument(id);
         return ResponseEntity.ok()

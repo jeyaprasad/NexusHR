@@ -63,6 +63,12 @@ public class DocumentService {
         return documentRepository.findByEmployeeOrderByUploadedAtDesc(emp);
     }
 
+    public boolean isOwner(Long documentId, String username) {
+        return documentRepository.findById(documentId)
+                .map(doc -> doc.getEmployee() != null && username != null && username.equalsIgnoreCase(doc.getEmployee().getEmail()))
+                .orElse(false);
+    }
+
     public Resource downloadDocument(Long id) throws MalformedURLException {
         Document doc = documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Document", "id", id));

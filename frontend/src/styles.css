@@ -119,7 +119,7 @@
   }
 }
 
-@keyframes insii-slide-up {
+@keyframes nexus-slide-up {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -130,7 +130,7 @@
   }
 }
 
-@keyframes insii-marquee {
+@keyframes nexus-marquee {
   from {
     transform: translateX(0);
   }
@@ -139,7 +139,7 @@
   }
 }
 
-@keyframes insii-pulse-dot {
+@keyframes nexus-pulse-dot {
   0%,
   100% {
     opacity: 1;
@@ -150,13 +150,13 @@
 }
 
 @utility animate-slide-up {
-  animation: insii-slide-up 0.8s var(--ease-out-expo) both;
+  animation: nexus-slide-up 0.8s var(--ease-out-expo) both;
 }
 
 @utility animate-marquee {
-  animation: insii-marquee 40s linear infinite;
+  animation: nexus-marquee 40s linear infinite;
 }
 
 @utility animate-pulse-dot {
-  animation: insii-pulse-dot 1.6s ease-in-out infinite;
+  animation: nexus-pulse-dot 1.6s ease-in-out infinite;
 }
