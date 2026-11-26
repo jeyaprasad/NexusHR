@@ -1,6 +1,11 @@
 spring:
+  application:
+    name: nexushr-test
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.autoconfigure.transformers.TransformersEmbeddingModelAutoConfiguration
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:nexushr_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -9,21 +14,23 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
   data:
     redis:
       host: localhost
       port: 6379
   ai:
-    huggingface:
-      chat:
-        api-key: mock-key-for-testing
-        url: https://api-inference.huggingface.co/models/test
     openai:
-      api-key: ${GROQ_API_KEY:mock-key}
+      api-key: mock-key
       base-url: https://api.groq.com/openai
       embedding:
         enabled: false
+      chat:
+        options:
+          model: openai/gpt-oss-20b
   mail:
     host: localhost
     port: 1025
@@ -32,6 +39,8 @@ app:
   jwt:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970337336763979244226452948404D635166546A576E5A7234753778214125442A47
     expiration-ms: 86400000
+  cors:
+    allowed-origins: http://localhost:3000
 
 huggingface:
   api:

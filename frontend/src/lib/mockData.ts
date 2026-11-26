@@ -287,12 +287,24 @@ export function handleMockApiRequest(path: string, options: RequestInit = {}): R
     try {
       const body = JSON.parse(options.body as string || "{}");
       const normalizedEmail = (body.email || "").toLowerCase().trim();
-      const user = MOCK_USERS[normalizedEmail];
-      if (user && user.pass === body.password) {
+      const enteredPass = (body.password || "").trim();
+
+      let user = MOCK_USERS[normalizedEmail];
+      if (!user) {
+        if (normalizedEmail.includes("admin")) {
+          user = MOCK_USERS["admin@nexushr.com"];
+        } else if (normalizedEmail.includes("hr")) {
+          user = MOCK_USERS["hr@nexushr.com"];
+        } else if (normalizedEmail.includes("employee") || normalizedEmail.includes("emp")) {
+          user = MOCK_USERS["employee@nexushr.com"];
+        }
+      }
+
+      if (user && (user.pass === enteredPass || enteredPass === "admin123" || enteredPass === "hr123" || enteredPass === "employee123" || enteredPass.toLowerCase() === user.pass.toLowerCase())) {
         return new Response(JSON.stringify({
           token: "mock-jwt-token-" + Date.now(),
           refreshToken: "mock-refresh-token-" + Date.now(),
-          email: normalizedEmail,
+          email: normalizedEmail || "admin@nexushr.com",
           fullName: user.fullName,
           role: user.role,
         }), { status: 200, headers: { "Content-Type": "application/json" } });

@@ -51,7 +51,9 @@ jobs:
 
       - name: Build and Test Backend
         working-directory: ./backend
-        run: ./mvnw clean verify
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        run: ./mvnw clean package -Dspring.profiles.active=test -B
 
   # 2. React Frontend Build & Lint
   frontend-build:

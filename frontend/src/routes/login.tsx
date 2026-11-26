@@ -38,13 +38,16 @@ function LoginPage() {
     setTimeout(() => setCopiedRole(null), 2000);
   };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function executeAuth(targetEmail: string, targetPass: string, isReg = false, regName = "", regRole = "EMPLOYEE") {
     setLoading(true);
     setError("");
     try {
-      const endpoint = isRegistering ? "/api/auth/register" : "/api/auth/login";
-      const payload = isRegistering ? { email, password, fullName, role } : { email, password };
+      const trimmedEmail = (targetEmail || "").trim();
+      const trimmedPass = (targetPass || "").trim();
+      const endpoint = isReg ? "/api/auth/register" : "/api/auth/login";
+      const payload = isReg
+        ? { email: trimmedEmail, password: trimmedPass, fullName: regName.trim(), role: regRole }
+        : { email: trimmedEmail, password: trimmedPass };
 
       let res: Response | null = null;
       try {
@@ -77,7 +80,7 @@ function LoginPage() {
       if (!res || !res.ok) {
         const data = res ? await res.json().catch(() => ({})) : {};
         throw new Error(
-          data.message || data.error || (isRegistering ? "Registration failed" : "Invalid credentials"),
+          data.message || data.error || (isReg ? "Registration failed" : "Invalid credentials"),
         );
       }
       const data = await res.json();
@@ -96,11 +99,16 @@ function LoginPage() {
       navigate({ to: "/dashboard" });
     } catch (err) {
       const errorMsg =
-        err instanceof Error ? err.message : isRegistering ? "Registration failed" : "Login failed";
+        err instanceof Error ? err.message : isReg ? "Registration failed" : "Login failed";
       setError(errorMsg);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await executeAuth(email, password, isRegistering, fullName, role);
   }
 
   return (
@@ -256,20 +264,40 @@ function LoginPage() {
                     title="Click to fill credentials"
                   >
                     <div>
-                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">{cred.role} <span className="text-[9px] font-normal text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">(Click to use)</span></div>
-                      <div className="text-muted-foreground"><span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span></div>
+                      <div className="text-[10px] uppercase text-primary font-bold mb-0.5">
+                        {cred.role}{" "}
+                        <span className="text-[9px] font-normal text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                          (Click to select)
+                        </span>
+                      </div>
+                      <div className="text-muted-foreground">
+                        <span className="text-foreground">{cred.email}</span> / <span className="text-foreground">{cred.pass}</span>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopyDemoCreds(cred.role, cred.email, cred.pass);
-                      }}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary cursor-pointer"
-                      title={`Copy ${cred.role} credentials`}
-                    >
-                      {copiedRole === cred.role ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          executeAuth(cred.email, cred.pass);
+                        }}
+                        className="px-2 py-1 text-[10px] font-sans font-medium rounded bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer whitespace-nowrap shrink-0"
+                        title={`1-Click Sign In as ${cred.role}`}
+                      >
+                        Sign in
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyDemoCreds(cred.role, cred.email, cred.pass);
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-secondary cursor-pointer"
+                        title={`Copy ${cred.role} credentials`}
+                      >
+                        {copiedRole === cred.role ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

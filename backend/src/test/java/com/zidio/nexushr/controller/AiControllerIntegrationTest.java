@@ -6,6 +6,7 @@ import com.zidio.nexushr.service.AiService;
 import com.zidio.nexushr.service.HrPolicyDocumentService;
 import com.zidio.nexushr.service.HuggingFaceService;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AiController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class AiControllerIntegrationTest {
 
     @Autowired
@@ -44,6 +47,9 @@ class AiControllerIntegrationTest {
 
     @MockBean
     private EmbeddingModel embeddingModel;
+
+    @MockBean
+    private ChatModel chatModel;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;

@@ -2,10 +2,8 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
-# Cache dependencies before copying source code to speed up builds
-RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
 # Stage 2: Create a lightweight runtime container
 FROM eclipse-temurin:21-jre-jammy
