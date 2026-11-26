@@ -165,9 +165,3 @@ Environment variables can be configured in `docker-compose.yml` or a local `.env
 | `APP_JWT_SECRET` | 256-bit+ secret key for JWT signing | *Development default provided* |
 | `GROQ_API_KEY` | Groq Cloud API key for LLM inference | `mock-key` (falls back to local responses) |
 | `SENTRY_DSN` | Sentry DSN for error monitoring | *Optional* |
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
