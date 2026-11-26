@@ -3,7 +3,17 @@ spring:
     name: nexushr-test
   autoconfigure:
     exclude:
+      # Spring AI — disable all AI/vector/embedding auto-configurations in tests
       - org.springframework.ai.autoconfigure.transformers.TransformersEmbeddingModelAutoConfiguration
+      - org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration
+      - org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration
+      - org.springframework.ai.autoconfigure.openai.OpenAiEmbeddingAutoConfiguration
+      # Redis — disable Redis auto-configuration; use in-memory CacheManager instead
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration
+      # Mail — disable mail sender
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
   datasource:
     url: jdbc:h2:mem:nexushr_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
@@ -15,9 +25,12 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
         format_sql: false
+        # Ignore column-level DDL hints (BYTEA, TEXT, etc.) which are PostgreSQL-specific
+        globally_quoted_identifiers: false
   data:
     redis:
       host: localhost
@@ -31,6 +44,9 @@ spring:
       chat:
         options:
           model: openai/gpt-oss-20b
+    vectorstore:
+      pgvector:
+        initialize-schema: false
   mail:
     host: localhost
     port: 1025

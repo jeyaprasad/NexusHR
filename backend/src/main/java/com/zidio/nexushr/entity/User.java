@@ -29,7 +29,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(nullable = false)
     private boolean enabled;
 
     @Column(updatable = false)
